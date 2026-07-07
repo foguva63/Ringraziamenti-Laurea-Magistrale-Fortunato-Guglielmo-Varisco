@@ -147,6 +147,9 @@ button{ font-family:inherit; color:inherit; cursor:pointer; border:none; backgro
 .scan-btn:active{ transform:scale(.98); }
 .scan-btn.armed{ box-shadow:0 0 28px rgba(143,209,79,.35); }
 .fingerprint{ font-size:26px; filter:drop-shadow(0 0 8px rgba(143,209,79,.5)); }
+.scan-icons{ display:flex; align-items:center; gap:7px; position:relative; z-index:1; }
+.scan-sep{ font-size:20px; opacity:.45; font-weight:400; }
+.faceid-ico{ width:25px; height:25px; filter:drop-shadow(0 0 8px rgba(143,209,79,.5)); }
 /* Barra di avanzamento pressione */
 .scan-fill{ position:absolute; inset:0; background:rgba(143,209,79,.22); width:0%; transition:width .05s linear; }
 .scan-hint{ font-size:11px; color:var(--phosphor-dim); letter-spacing:.14em; text-transform:uppercase; }
@@ -363,9 +366,24 @@ button{ font-family:inherit; color:inherit; cursor:pointer; border:none; backgro
     </div>
 
     <div class="scan-cta">
-      <button id="scanBtn" class="scan-btn" aria-label="Esegui scansione biometrica">
+      <button id="scanBtn" class="scan-btn" aria-label="Esegui scansione biometrica: impronta o Face ID">
         <span class="scan-fill" id="scanFill"></span>
-        <span class="fingerprint">🫆</span>
+        <span class="scan-icons">
+          <span class="fingerprint">🫆</span>
+          <span class="scan-sep">/</span>
+          <!-- glifo Face ID (usa il colore del bottone) -->
+          <svg class="faceid-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 8V6a2 2 0 0 1 2-2h2"/>
+            <path d="M16 4h2a2 2 0 0 1 2 2v2"/>
+            <path d="M20 16v2a2 2 0 0 1-2 2h-2"/>
+            <path d="M8 20H6a2 2 0 0 1-2-2v-2"/>
+            <path d="M9 9.5v1.5"/>
+            <path d="M15 9.5v1.5"/>
+            <path d="M12 9v3.2"/>
+            <path d="M9.3 14.4a4 4 0 0 0 5.4 0"/>
+          </svg>
+        </span>
         <span>Esegui scansione biometrica</span>
       </button>
       <div class="scan-hint">tieni premuto · impronta / faceid</div>
