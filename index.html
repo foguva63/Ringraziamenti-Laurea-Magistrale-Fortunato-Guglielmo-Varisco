@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<!-- Mobile-first: viewport bloccato, niente zoom accidentale con una mano sola -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<meta name="theme-color" content="#070d09" />
+<title>CREMA-LOCKER // Accesso Festa</title>
+
+<!-- Font: JetBrains Mono (terminale + dati) + Fraunces (titolo celebrativo).
+     Fallback robusti: se la wifi della festa fa i capricci, resta comunque leggibile. -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+
+<style>
+/* =====================================================================
+   ⚙️  DESIGN TOKENS  —  cambia qui i colori se vuoi
+   Idea di fondo: il "verde hacker" È il verde pistacchio di Bronte.
+   ===================================================================== */
+:root{
+  /* Fase hacker (scura) */
+  --bg:            #070d09;   /* nero-verde profondo (fosforo CRT) */
+  --bg-2:          #0b140e;
+  --grid:          rgba(143,209,79,.06);
+  --phosphor:      #8FD14F;   /* verde pistacchio fosforescente = accento */
+  --phosphor-dim:  #4c7a34;
+  --cyan:          #4FE0D1;   /* accento secondario ciano */
+  --danger:        #ff4b57;   /* alert / accesso negato */
+  --ink:           #cfeecb;   /* testo su fondo scuro */
+
+  /* Fase festa (chiara, calda, siciliana) */
+  --cream:         #f6f1e4;
+  --cream-2:       #efe7d3;
+  --pistachio:     #5f8f4e;   /* pistacchio "vero", pieno */
+  --pistachio-dk:  #2f4a26;
+  --gold:          #cf9d3f;   /* accento oro / festa */
+  --party-ink:     #23301c;
+
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  --serif: "Fraunces", ui-serif, Georgia, "Times New Roman", serif;
+}
+
+/* ===== Reset essenziale ===== */
+*{ margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html,body{ height:100%; }
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--mono);
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+button{ font-family:inherit; color:inherit; cursor:pointer; border:none; background:none; }
+
+/* ===== Gestione schermate (transizioni GPU: opacity + transform) ===== */
+.screen{
+  position:fixed; inset:0;
+  display:flex; flex-direction:column;
+  padding:22px 20px calc(22px + env(safe-area-inset-bottom));
+  opacity:0; visibility:hidden; transform:translateY(8px);
+  transition:opacity .5s ease, transform .5s ease, visibility .5s;
+  overflow-y:auto; -webkit-overflow-scrolling:touch;
+  will-change:opacity, transform;
+}
+.screen.is-active{ opacity:1; visibility:visible; transform:none; }
+
+/* ============================================================
+   FASE 1 — TERMINALE / FINTO RANSOMWARE
+   ============================================================ */
+#screen-boot{
+  background:
+    radial-gradient(120% 80% at 50% 0%, rgba(143,209,79,.10), transparent 60%),
+    linear-gradient(var(--bg), var(--bg-2));
+  justify-content:flex-start;
+}
+/* Griglia cyberpunk di sfondo */
+#screen-boot::before{
+  content:""; position:absolute; inset:0; z-index:0; pointer-events:none;
+  background-image:linear-gradient(var(--grid) 1px, transparent 1px),
+                   linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size:34px 34px;
+  mask-image:radial-gradient(120% 90% at 50% 20%, #000 40%, transparent 90%);
+}
+/* Linea di scansione CRT che scorre in ambiente (leggera) */
+#screen-boot::after{
+  content:""; position:absolute; left:0; right:0; height:140px; z-index:0; pointer-events:none;
+  background:linear-gradient(180deg, transparent, rgba(143,209,79,.05), transparent);
+  animation:crtSweep 6s linear infinite;
+}
+@keyframes crtSweep{ 0%{transform:translateY(-160px)} 100%{transform:translateY(100vh)} }
+
+.term-wrap{ position:relative; z-index:1; display:flex; flex-direction:column; min-height:100%; gap:16px; }
+
+.brand{ display:flex; align-items:center; gap:10px; font-size:12px; letter-spacing:.18em; color:var(--phosphor-dim); text-transform:uppercase; }
+.dot{ width:9px; height:9px; border-radius:50%; background:var(--danger); box-shadow:0 0 10px var(--danger); animation:pulse 1.4s ease-in-out infinite; }
+@keyframes pulse{ 50%{ opacity:.35 } }
+
+/* Banner ransomware ironico */
+.ransom{
+  border:1px solid rgba(255,75,87,.4);
+  background:linear-gradient(180deg, rgba(255,75,87,.12), rgba(255,75,87,.03));
+  border-radius:14px; padding:16px 16px;
+}
+.ransom .lock{ font-size:30px; line-height:1; }
+.ransom h1{
+  font-family:var(--mono); font-weight:700; font-size:19px; line-height:1.25;
+  margin:8px 0 6px; color:#fff; letter-spacing:.01em;
+}
+.ransom h1 .glitch{ color:var(--danger); position:relative; }
+.ransom p{ font-size:13px; color:#f4c9cd; line-height:1.5; }
+
+/* Finestra terminale con i log */
+.terminal{
+  flex:1; min-height:150px;
+  border:1px solid rgba(143,209,79,.25); border-radius:14px;
+  background:rgba(3,8,4,.75); backdrop-filter:blur(2px);
+  padding:14px 14px; font-size:12.5px; line-height:1.65;
+  overflow:hidden; position:relative;
+}
+.terminal .bar{ display:flex; gap:6px; margin-bottom:10px; }
+.terminal .bar i{ width:11px; height:11px; border-radius:50%; display:block; }
+.terminal .bar i:nth-child(1){ background:#ff5f57 }
+.terminal .bar i:nth-child(2){ background:#febc2e }
+.terminal .bar i:nth-child(3){ background:#28c840 }
+#log .line{ opacity:0; transform:translateX(-6px); animation:logIn .18s forwards; white-space:pre-wrap; word-break:break-word; }
+@keyframes logIn{ to{ opacity:1; transform:none } }
+.tag-info{ color:var(--cyan) } .tag-ok{ color:var(--phosphor) }
+.tag-warn{ color:#febc2e } .tag-fail{ color:var(--danger) } .muted{ color:var(--phosphor-dim) }
+.caret{ display:inline-block; width:9px; height:15px; background:var(--phosphor); vertical-align:-2px; animation:blink 1s step-end infinite; }
+@keyframes blink{ 50%{ opacity:0 } }
+
+/* Bottone scansione biometrica (grande, touch-friendly, una mano) */
+.scan-cta{ display:flex; flex-direction:column; align-items:center; gap:10px; padding-top:4px; }
+.scan-btn{
+  position:relative; width:100%; max-width:420px;
+  border:1.5px solid var(--phosphor); border-radius:16px;
+  background:linear-gradient(180deg, rgba(143,209,79,.16), rgba(143,209,79,.05));
+  color:var(--phosphor); font-weight:700; letter-spacing:.02em;
+  padding:20px 18px; font-size:15px;
+  display:flex; align-items:center; justify-content:center; gap:12px;
+  overflow:hidden; touch-action:manipulation;
+  transition:transform .12s ease, box-shadow .2s ease;
+  box-shadow:0 0 0 rgba(143,209,79,0);
+}
+.scan-btn:active{ transform:scale(.98); }
+.scan-btn.armed{ box-shadow:0 0 28px rgba(143,209,79,.35); }
+.fingerprint{ font-size:26px; filter:drop-shadow(0 0 8px rgba(143,209,79,.5)); }
+/* Barra di avanzamento pressione */
+.scan-fill{ position:absolute; inset:0; background:rgba(143,209,79,.22); width:0%; transition:width .05s linear; }
+.scan-hint{ font-size:11px; color:var(--phosphor-dim); letter-spacing:.14em; text-transform:uppercase; }
+
+/* Overlay radar/laser durante la scansione */
+#scanOverlay{
+  position:fixed; inset:0; z-index:50; display:none;
+  background:radial-gradient(circle at 50% 44%, rgba(7,13,9,.6), rgba(7,13,9,.96));
+  align-items:center; justify-content:center; flex-direction:column; gap:26px;
+}
+#scanOverlay.show{ display:flex; animation:fadeIn .3s ease; }
+@keyframes fadeIn{ from{opacity:0} }
+.radar{
+  width:210px; height:210px; border-radius:50%; position:relative;
+  border:1px solid rgba(143,209,79,.4);
+  box-shadow:inset 0 0 40px rgba(143,209,79,.15);
+}
+.radar::before,.radar::after{ content:""; position:absolute; border-radius:50%; border:1px solid rgba(143,209,79,.18); }
+.radar::before{ inset:34px } .radar::after{ inset:68px }
+.radar .sweep{
+  position:absolute; inset:0; border-radius:50%;
+  background:conic-gradient(from 0deg, transparent 0deg, rgba(143,209,79,.55) 40deg, transparent 60deg);
+  animation:spin 1.1s linear infinite;
+}
+@keyframes spin{ to{ transform:rotate(360deg) } }
+.radar .print{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:80px; opacity:.85; filter:drop-shadow(0 0 12px rgba(143,209,79,.6)); }
+.radar .laser{
+  position:absolute; left:0; right:0; height:2px; background:var(--phosphor);
+  box-shadow:0 0 14px 2px var(--phosphor); animation:laserY 1.4s ease-in-out infinite;
+}
+@keyframes laserY{ 0%,100%{ top:12% } 50%{ top:88% } }
+#scanStatus{ font-size:13px; letter-spacing:.16em; text-transform:uppercase; color:var(--phosphor); }
+
+/* --- Overlay FaceID (scansione volto con fotocamera live) --- */
+#faceOverlay{ position:fixed; inset:0; z-index:55; display:none; align-items:center; justify-content:center; background:#04070d; }
+#faceOverlay.show{ display:flex; animation:fadeIn .3s ease; }
+#faceVideo{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+  transform:scaleX(-1); /* effetto selfie a specchio */ filter:contrast(1.05) saturate(.8) brightness(.9); }
+.face-tint{ position:absolute; inset:0; z-index:1; pointer-events:none;
+  background:radial-gradient(circle at 50% 42%, rgba(7,13,9,.15), rgba(7,13,9,.9)); }
+/* Righe di scansione tipo visore */
+.face-tint::before{ content:""; position:absolute; inset:0;
+  background:repeating-linear-gradient(0deg, rgba(143,209,79,.05) 0 1px, transparent 1px 4px); }
+.face-reticle{ position:relative; z-index:2; width:230px; height:300px; overflow:hidden;
+  border-radius:50% 50% 46% 46%; border:1.5px solid rgba(143,209,79,.55);
+  box-shadow:0 0 40px rgba(143,209,79,.25), inset 0 0 30px rgba(143,209,79,.15); }
+.face-reticle .brk{ position:absolute; width:26px; height:26px; border:2px solid var(--phosphor); }
+.face-reticle .brk.tl{ top:-2px; left:-2px; border-right:none; border-bottom:none; border-radius:14px 0 0 0; }
+.face-reticle .brk.tr{ top:-2px; right:-2px; border-left:none; border-bottom:none; border-radius:0 14px 0 0; }
+.face-reticle .brk.bl{ bottom:-2px; left:-2px; border-right:none; border-top:none; border-radius:0 0 0 14px; }
+.face-reticle .brk.br{ bottom:-2px; right:-2px; border-left:none; border-top:none; border-radius:0 0 14px 0; }
+.face-line{ position:absolute; left:0; right:0; height:2px; background:var(--phosphor);
+  box-shadow:0 0 16px 3px var(--phosphor); animation:faceScanY 1.6s ease-in-out infinite; }
+@keyframes faceScanY{ 0%,100%{ top:6% } 50%{ top:92% } }
+#faceStatus{ position:absolute; z-index:3; bottom:16%; left:0; right:0; text-align:center;
+  font-size:13px; letter-spacing:.16em; text-transform:uppercase; color:var(--phosphor);
+  text-shadow:0 0 12px rgba(143,209,79,.6); }
+#facePriv{ position:absolute; z-index:3; bottom:8%; left:0; right:0; text-align:center;
+  font-size:10.5px; letter-spacing:.08em; color:var(--phosphor-dim); }
+
+/* ============================================================
+   FASE 2 — AUTENTICAZIONE (privilegi + quiz)
+   ============================================================ */
+#screen-auth{
+  background:linear-gradient(var(--bg), var(--bg-2));
+  justify-content:center; gap:18px;
+}
+#screen-auth .grid-bg{ position:absolute; inset:0; z-index:0;
+  background-image:linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size:34px 34px; mask-image:radial-gradient(120% 90% at 50% 50%, #000 30%, transparent 85%); }
+.auth-inner{ position:relative; z-index:1; display:flex; flex-direction:column; gap:16px; margin:auto 0; }
+.auth-head{ text-align:center; }
+.auth-head .status{ color:var(--danger); font-size:12px; letter-spacing:.16em; text-transform:uppercase; }
+.auth-head h2{ font-family:var(--mono); font-weight:700; font-size:18px; margin-top:8px; color:#fff; line-height:1.35; }
+.auth-head p{ font-size:12.5px; color:var(--phosphor-dim); margin-top:8px; }
+
+.role-btn{
+  width:100%; text-align:left; border:1px solid rgba(143,209,79,.3); border-radius:14px;
+  background:rgba(143,209,79,.05); padding:18px 16px; margin-bottom:0;
+  display:flex; align-items:center; gap:14px; transition:transform .12s ease, border-color .2s, background .2s;
+}
+.role-btn:active{ transform:scale(.985); }
+.role-btn.sel{ border-color:var(--phosphor); background:rgba(143,209,79,.12); }
+.role-btn .emo{ font-size:26px; }
+.role-btn b{ display:block; color:var(--phosphor); font-size:15px; }
+.role-btn span{ font-size:11.5px; color:var(--phosphor-dim); }
+.roles{ display:flex; flex-direction:column; gap:12px; }
+
+/* Quiz */
+.quiz{ border:1px solid rgba(79,224,209,.3); border-radius:14px; background:rgba(79,224,209,.04); padding:16px; }
+.quiz .q-label{ font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--cyan); }
+.quiz .q-text{ font-size:14.5px; line-height:1.5; color:#fff; margin:10px 0 14px; }
+.quiz .opt{
+  width:100%; text-align:left; border:1px solid rgba(207,238,203,.22); border-radius:11px;
+  background:rgba(255,255,255,.02); padding:15px 14px; margin-bottom:10px; font-size:13.5px; color:var(--ink);
+  display:flex; gap:10px; transition:transform .1s, border-color .2s, background .2s;
+}
+.quiz .opt:active{ transform:scale(.99); }
+.quiz .opt .k{ color:var(--cyan); font-weight:700; }
+.quiz .opt.wrong{ border-color:var(--danger); background:rgba(255,75,87,.12); animation:shake .35s; }
+.quiz .opt.right{ border-color:var(--phosphor); background:rgba(143,209,79,.14); }
+@keyframes shake{ 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
+.alert-neg{ margin-top:6px; color:var(--danger); font-size:12.5px; line-height:1.5; display:none; }
+.alert-neg.show{ display:block; animation:fadeIn .3s; }
+.back-link{ text-align:center; color:var(--phosphor-dim); font-size:12px; margin-top:4px; text-decoration:underline; }
+
+/* Overlay ACCESS GRANTED */
+#grantOverlay{ position:fixed; inset:0; z-index:60; display:none; align-items:center; justify-content:center;
+  background:rgba(7,13,9,.96); flex-direction:column; gap:14px; }
+#grantOverlay.show{ display:flex; }
+#grantOverlay .big{ font-family:var(--mono); font-weight:700; font-size:26px; letter-spacing:.05em; color:var(--phosphor);
+  text-shadow:0 0 24px rgba(143,209,79,.6); animation:grantPop .5s cubic-bezier(.2,1.4,.4,1); text-align:center; }
+@keyframes grantPop{ from{ transform:scale(.6); opacity:0 } }
+#grantOverlay small{ color:var(--cyan); letter-spacing:.2em; font-size:12px; }
+.grant-bars{ display:flex; gap:6px; margin-top:6px; }
+.grant-bars i{ width:8px; height:26px; background:var(--phosphor); border-radius:2px; opacity:.25; animation:eq .8s ease-in-out infinite; }
+.grant-bars i:nth-child(2){ animation-delay:.1s } .grant-bars i:nth-child(3){ animation-delay:.2s }
+.grant-bars i:nth-child(4){ animation-delay:.3s } .grant-bars i:nth-child(5){ animation-delay:.4s }
+@keyframes eq{ 50%{ transform:scaleY(1.9); opacity:1 } }
+
+/* ============================================================
+   FASE 3 — LA FESTA (reveal chiaro, caldo, siciliano)
+   ============================================================ */
+#screen-party{
+  background:
+    radial-gradient(130% 60% at 50% 0%, rgba(207,157,63,.16), transparent 60%),
+    linear-gradient(var(--cream), var(--cream-2));
+  color:var(--party-ink); gap:20px; align-items:center;
+}
+#screen-party.is-active{ animation:partyReveal .7s ease; }
+@keyframes partyReveal{ from{ opacity:0; transform:scale(1.03) } }
+.party-inner{ width:100%; max-width:440px; margin:auto; display:flex; flex-direction:column; gap:18px; }
+
+.badge{ align-self:center; display:inline-flex; align-items:center; gap:8px; font-family:var(--mono);
+  font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--pistachio);
+  border:1px solid rgba(95,143,78,.4); border-radius:999px; padding:7px 14px; background:rgba(95,143,78,.06); }
+
+.title{ text-align:center; }
+.title .eyebrow{ font-family:var(--mono); font-size:12px; letter-spacing:.22em; text-transform:uppercase; color:var(--gold); }
+.title h1{ font-family:var(--serif); font-weight:600; font-size:34px; line-height:1.06; margin:10px 0 4px; color:var(--pistachio-dk); text-wrap:balance; }
+.title h1 em{ font-style:italic; color:var(--pistachio); }
+.title .sub{ font-family:var(--mono); font-size:12.5px; color:var(--pistachio); letter-spacing:.04em; margin-top:6px; }
+
+.card{ background:#fff; border:1px solid rgba(95,143,78,.18); border-radius:18px; padding:20px;
+  box-shadow:0 10px 30px -18px rgba(47,74,38,.5); }
+.thanks p{ font-size:15px; line-height:1.62; color:var(--party-ink); }
+.thanks p + p{ margin-top:12px; }
+.sign{ font-family:var(--serif); font-style:italic; font-size:20px; color:var(--pistachio-dk); margin-top:14px; text-align:right; }
+
+/* Counter DB vasetti + glicemia */
+.counters{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.counter{ background:#fff; border:1px solid rgba(95,143,78,.18); border-radius:16px; padding:16px 14px; text-align:center; }
+.counter .lbl{ font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--pistachio); }
+.counter .num{ font-family:var(--mono); font-weight:700; font-size:30px; color:var(--pistachio-dk); margin-top:4px; font-variant-numeric:tabular-nums; }
+.counter .num.glic{ color:var(--gold); }
+.hack-btn{ width:100%; border:1.5px solid var(--pistachio); border-radius:14px; background:var(--pistachio);
+  color:#fff; font-family:var(--mono); font-weight:700; font-size:14px; padding:16px; letter-spacing:.02em;
+  transition:transform .1s ease, filter .2s; }
+.hack-btn:active{ transform:scale(.98); filter:brightness(1.08); }
+.hack-msg{ text-align:center; font-family:var(--mono); font-size:12px; color:var(--gold); min-height:16px; margin-top:2px; }
+
+/* Widget placeholder: foto + playlist */
+.widget-head{ font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--pistachio); margin-bottom:10px; }
+.photo-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+.photo-grid .ph{ aspect-ratio:1; border-radius:12px; border:1.5px dashed rgba(95,143,78,.45);
+  display:flex; align-items:center; justify-content:center; font-size:22px; color:var(--pistachio); background:rgba(95,143,78,.04); }
+.photo-grid a{ aspect-ratio:1; border-radius:12px; overflow:hidden; display:block; background:rgba(95,143,78,.08);
+  border:1px solid rgba(95,143,78,.2); }
+.photo-grid a img{ width:100%; height:100%; object-fit:cover; display:block; }
+.photo-grid .ph.loading{ animation:phPulse 1.1s ease-in-out infinite; }
+@keyframes phPulse{ 50%{ opacity:.4 } }
+.photo-status{ font-family:var(--mono); font-size:11.5px; color:var(--pistachio); text-align:center; min-height:15px; margin-top:10px; }
+.photo-status.err{ color:var(--gold); }
+.link-row{ display:flex; flex-direction:column; gap:10px; margin-top:12px; }
+.big-link{ display:flex; align-items:center; justify-content:center; gap:10px; text-decoration:none; border:none; width:100%;
+  border-radius:14px; padding:15px; font-family:var(--mono); font-weight:700; font-size:13.5px; letter-spacing:.02em; cursor:pointer;
+  transition:transform .1s ease, filter .2s; }
+.big-link:active{ transform:scale(.98); filter:brightness(1.05); }
+.big-link.upload{ background:var(--pistachio); color:#fff; }
+.big-link.upload:disabled{ opacity:.55; filter:grayscale(.3); cursor:progress; }
+.big-link.photos{ background:var(--pistachio-dk); color:var(--cream); }
+.big-link.music{ background:var(--gold); color:#3a2a06; }
+
+.footer{ text-align:center; font-family:var(--mono); font-size:11px; color:var(--pistachio); opacity:.75; letter-spacing:.08em; padding:6px 0 4px; }
+
+/* ===== Accessibilità: rispetta chi disattiva le animazioni ===== */
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration:.001s !important; animation-iteration-count:1 !important; transition-duration:.15s !important; }
+  #screen-boot::after,.radar .sweep,.dot{ animation:none !important; }
+}
+:focus-visible{ outline:2px solid var(--phosphor); outline-offset:2px; }
+
+@media (min-width:520px){ .title h1{ font-size:42px; } }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     FASE 1 — TERMINALE / FINTO RANSOMWARE
+     ============================================================ -->
+<section id="screen-boot" class="screen is-active">
+  <div class="term-wrap">
+    <div class="brand"><span class="dot"></span> crema-locker · secure node // bronte-01</div>
+
+    <div class="ransom">
+      <div class="lock">🔒</div>
+      <h1>⚠ <span class="glitch">CREMA-LOCKER</span> v2.0 — i tuoi cucchiaini sono stati cifrati</h1>
+      <p>Rilevato tentativo di bypass del buffet. Per decifrare il vasetto di crema è richiesta l'autenticazione biometrica dell'ospite.</p>
+    </div>
+
+    <div class="terminal">
+      <div class="bar"><i></i><i></i><i></i></div>
+      <div id="log"></div>
+    </div>
+
+    <div class="scan-cta">
+      <button id="scanBtn" class="scan-btn" aria-label="Esegui scansione biometrica">
+        <span class="scan-fill" id="scanFill"></span>
+        <span class="fingerprint">🫆</span>
+        <span>Esegui scansione biometrica</span>
+      </button>
+      <div class="scan-hint">tieni premuto · impronta / faceid</div>
+    </div>
+  </div>
+</section>
+
+<!-- Overlay radar durante la scansione -->
+<div id="scanOverlay">
+  <div class="radar">
+    <div class="sweep"></div>
+    <div class="laser"></div>
+    <div class="print">🫆</div>
+  </div>
+  <div id="scanStatus">Analisi impronta…</div>
+</div>
+
+<!-- Overlay FaceID: anteprima fotocamera + reticolo volto -->
+<div id="faceOverlay">
+  <video id="faceVideo" playsinline autoplay muted></video>
+  <div class="face-tint"></div>
+  <div class="face-reticle">
+    <span class="brk tl"></span><span class="brk tr"></span>
+    <span class="brk bl"></span><span class="brk br"></span>
+    <div class="face-line"></div>
+  </div>
+  <div id="faceStatus">Rilevamento volto…</div>
+  <div id="facePriv">nessuna immagine viene salvata o inviata</div>
+</div>
+
+<!-- ============================================================
+     FASE 2 — AUTENTICAZIONE
+     ============================================================ -->
+<section id="screen-auth" class="screen">
+  <div class="grid-bg"></div>
+  <div class="auth-inner">
+    <div class="auth-head">
+      <div class="status">● identità non verificata</div>
+      <h2 id="authTitle">Seleziona il tuo livello di privilegio<br>per accedere al backend della festa</h2>
+      <p>Root access riservato al neodottore.</p>
+    </div>
+
+    <!-- Selezione ruolo -->
+    <div class="roles" id="roles">
+      <button class="role-btn" data-role="parente">
+        <span class="emo">👨‍👩‍👧</span>
+        <span><b>Parente / Famiglia</b><span>permessi: affetto illimitato, sudo assistenza-tecnica</span></span>
+      </button>
+      <button class="role-btn" data-role="amico">
+        <span class="emo">🍻</span>
+        <span><b>Amico Storico</b><span>permessi: read/write ricordi, accesso goliardia</span></span>
+      </button>
+      <button class="role-btn" data-role="collega">
+        <span class="emo">🧑‍💻</span>
+        <span><b>Collega Ingegnere / Nerd</b><span>permessi: kernel-level, ssh diretto al cervello</span></span>
+      </button>
+    </div>
+
+    <!-- Quiz (popolato via JS) -->
+    <div class="quiz" id="quizBox" style="display:none;">
+      <div class="q-label" id="qLabel">captcha umano · 1/1</div>
+      <div class="q-text" id="qText"></div>
+      <div id="qOptions"></div>
+      <div class="alert-neg" id="qAlert"></div>
+      <div class="back-link" id="qBack">← cambia livello di privilegio</div>
+    </div>
+  </div>
+</section>
+
+<!-- Overlay ACCESS GRANTED -->
+<div id="grantOverlay">
+  <div class="big">ACCESS GRANTED</div>
+  <small>decifratura crema completata</small>
+  <div class="grant-bars"><i></i><i></i><i></i><i></i><i></i></div>
+</div>
+
+<!-- ============================================================
+     FASE 3 — LA FESTA (reveal)
+     ============================================================ -->
+<section id="screen-party" class="screen">
+  <div class="party-inner">
+    <div class="badge">🔓 sistema sbloccato · benvenuto</div>
+
+    <div class="title">
+      <div class="eyebrow">missione compilata con successo</div>
+      <!-- 🔧 PERSONALIZZA QUI il nome del festeggiato -->
+      <h1>Dott. <em id="honoreeName">Fortunato Guglielmo Varisco</em></h1>
+      <div class="sub">Laurea Magistrale · Ingegneria Informatica — Cybersecurity</div>
+    </div>
+
+    <!-- 🔧 PERSONALIZZA QUI il messaggio di ringraziamento -->
+    <div class="card thanks">
+      <p>Grazie di cuore per essere qui a festeggiare questo traguardo con me. 🎓</p>
+      <p>Dietro ogni riga di codice e ogni notte insonne c'eravate voi: la mia rete di sicurezza più affidabile, il mio backup quando tutto sembrava andare in crash. Questo vasetto di crema siciliana è un piccolo grazie, cifrato con affetto e servito in cassetta della frutta stampata in 3D.</p>
+      <p>Godetevi la festa, il buffet è ufficialmente <b>senza firewall</b>. 🍕</p>
+      <div class="sign">— con gratitudine, il neodottore</div>
+    </div>
+
+    <!-- Counter: vasetti nel DB + glicemia -->
+    <div class="counters">
+      <div class="counter">
+        <div class="lbl">Vasetti nel DB</div>
+        <div class="num" id="jarCount">0</div>
+      </div>
+      <div class="counter">
+        <div class="lbl">Glicemia (mg/dL)</div>
+        <div class="num glic" id="glicCount">90</div>
+      </div>
+    </div>
+    <button class="hack-btn" id="hackBtn">🥄 Hackera un altro cucchiaino</button>
+    <div class="hack-msg" id="hackMsg"></div>
+
+    <!-- Widget foto (immagini locali dalla cartella photos/) + playlist -->
+    <div class="card">
+      <div class="widget-head">📸 Muro delle foto della festa</div>
+      <div class="photo-grid" id="photoGrid">
+        <div class="ph">＋</div><div class="ph">＋</div><div class="ph">＋</div>
+        <div class="ph">＋</div><div class="ph">＋</div><div class="ph">＋</div>
+      </div>
+      <div class="link-row">
+        <a class="big-link music" id="musicLink" href="#" target="_blank" rel="noopener">🎵 Apri la playlist della festa</a>
+      </div>
+    </div>
+
+    <div class="footer">// end of transmission · grazie 💚</div>
+  </div>
+</section>
+
+<script>
+/* =====================================================================
+   ⚙️  CONFIGURAZIONE  —  MODIFICA SOLO QUESTA PARTE
+   Tutto ciò che è personalizzabile è qui: nome, ringraziamenti,
+   domande del quiz, counter e link. Il resto è "il motore".
+   ===================================================================== */
+const CONFIG = {
+  nomeFesteggiato: "Fortunato Guglielmo Varisco",   // 🔧 il tuo nome
+  vasettiIniziali: 42,                 // 🔧 quanti vasetti "nel database"
+  glicemiaIniziale: 90,                // 🔧 punto di partenza (mg/dL)
+  linkMusica:"#",                      // 🔧 URL playlist (es. Spotify)
+
+  // 🔧 MURO FOTO — elenca i file che metti nella cartella "photos/" della repo.
+  //    Carichi le immagini a mano su GitHub, poi aggiungi qui il loro nome.
+  //    Se lasci l'array vuoto [], il muro mostra i segnaposto "＋".
+  photos: [
+    // "photos/foto1.jpg",
+    // "photos/foto2.jpg",
+    // "photos/foto3.jpg",
+  ],
+
+  // Log del terminale (Fase 1). Aggiungi/rimuovi liberamente le righe.
+  bootLog: [
+    { t:"info", m:"Inizializzazione kernel_pistacchio v4.0 …" },
+    { t:"ok",   m:"Caricamento moduli_sicilia.sys … OK" },
+    { t:"ok",   m:"Mount /dev/cassetta_frutta … OK" },
+    { t:"info", m:"Handshake TLS con vasetto_bronte … stabilito" },
+    { t:"warn", m:"Livello glicemico non autorizzato rilevato" },
+    { t:"info", m:"Generazione chiave AES-256-BRONTE …" },
+    { t:"warn", m:"Scansione porte del buffet … 3 aperte" },
+    { t:"fail", m:"Rilevato tentativo di bypass del buffet!" },
+    { t:"info", m:"Deploy honeypot per parenti che chiedono 'e un lavoro vero?' …" },
+    { t:"fail", m:"Accesso al vasetto NEGATO: autenticazione richiesta" }
+  ],
+
+  // 🔧 QUIZ — una domanda per ruolo. correct = indice risposta giusta (0 = A, 1 = B …)
+  quiz: {
+    parente: {
+      q: "Quante volte hai chiesto al festeggiato di aggiustarti la stampante o il Wi-Fi?",
+      opts: ["Troppe, ho perso il conteggio.", "Mai, sono un hacker autonomo."],
+      correct: 0,
+      wrong: "ACCESSO NEGATO: risposta troppo onesta, riprova… o corrompi il neodottore con un brindisi. 🍷"
+    },
+    amico: {
+      q: "Da quanti anni prometti al festeggiato che 'stavolta studio anch'io'?",
+      opts: ["Da così tanti che è diventato Dottore prima di me.", "Studio? Io reggo il morale, è un lavoro a tempo pieno."],
+      correct: 1,
+      wrong: "ACCESSO NEGATO: nice try. Riprova o offri il prossimo giro. 🍻"
+    },
+    collega: {
+      q: "Qual è il miglior modo per mitigare un attacco DDoS al tavolo dei dolci?",
+      opts: ["Configurare un Cloudflare protettivo davanti al buffet.", "Fare SQL Injection direttamente sul vasetto di pistacchio."],
+      correct: 0,
+      wrong: "ACCESSO NEGATO: quella è una vulnerabilità, non una difesa. Riprova, collega. 🧑‍💻"
+    }
+  }
+};
+
+/* =====================================================================
+   🔒  IL MOTORE  —  di norma non serve toccare da qui in giù
+   ===================================================================== */
+
+// ----- Helper vibrazione (Web Vibration API) -----
+function buzz(pattern){
+  try{ if(navigator.vibrate) navigator.vibrate(pattern); }catch(e){}
+}
+
+// ----- Applica la configurazione ai testi statici -----
+document.getElementById("honoreeName").textContent = CONFIG.nomeFesteggiato;
+document.getElementById("musicLink").href  = CONFIG.linkMusica;
+let jars  = CONFIG.vasettiIniziali;
+let glic  = CONFIG.glicemiaIniziale;
+
+// ----- Cambio schermata con transizione fluida -----
+function showScreen(id){
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("is-active"));
+  document.getElementById(id).classList.add("is-active");
+  window.scrollTo(0,0);
+}
+
+/* ---------- FASE 1: stampa dei log del terminale ---------- */
+const logEl = document.getElementById("log");
+const TAGS = { info:["INFO","tag-info"], ok:["OK","tag-ok"], warn:["WARN","tag-warn"], fail:["FAIL","tag-fail"] };
+let li = 0;
+function printLog(){
+  if(li >= CONFIG.bootLog.length){
+    const c = document.createElement("div");
+    c.className = "line muted";
+    c.innerHTML = '$ waiting_biometric_auth <span class="caret"></span>';
+    logEl.appendChild(c);
+    return;
+  }
+  const item = CONFIG.bootLog[li++];
+  const [label, cls] = TAGS[item.t] || TAGS.info;
+  const row = document.createElement("div");
+  row.className = "line";
+  row.innerHTML = '<span class="'+cls+'">['+label+']</span> ' + item.m;
+  logEl.appendChild(row);
+  logEl.parentElement.scrollTop = logEl.parentElement.scrollHeight;
+  // velocità variabile per un effetto più "vivo"
+  setTimeout(printLog, 190 + Math.random()*160);
+}
+printLog();
+
+/* ---------- FASE 1: bottone scansione (tieni premuto o click) ---------- */
+const scanBtn   = document.getElementById("scanBtn");
+const scanFill  = document.getElementById("scanFill");
+const overlay   = document.getElementById("scanOverlay");
+const scanStatus= document.getElementById("scanStatus");
+const faceOverlay = document.getElementById("faceOverlay");
+const faceVideo   = document.getElementById("faceVideo");
+const faceStatus  = document.getElementById("faceStatus");
+const HOLD_MS = 900;           // durata della "pressione" per completare
+let holdRAF = null, holdStart = 0, scanning = false;
+
+function startHold(e){
+  if(scanning) return;
+  e.preventDefault();
+  scanBtn.classList.add("armed");
+  buzz(30);
+  holdStart = performance.now();
+  const step = (now) => {
+    const p = Math.min((now - holdStart) / HOLD_MS, 1);
+    scanFill.style.width = (p*100) + "%";
+    if(p >= 1){ runScan(); return; }
+    holdRAF = requestAnimationFrame(step);
+  };
+  holdRAF = requestAnimationFrame(step);
+}
+function cancelHold(){
+  if(scanning) return;
+  cancelAnimationFrame(holdRAF);
+  scanBtn.classList.remove("armed");
+  scanFill.style.width = "0%";
+}
+// Supporto sia touch che mouse
+scanBtn.addEventListener("touchstart", startHold, {passive:false});
+scanBtn.addEventListener("touchend",   cancelHold);
+scanBtn.addEventListener("touchcancel",cancelHold);
+scanBtn.addEventListener("mousedown",  startHold);
+scanBtn.addEventListener("mouseup",    cancelHold);
+scanBtn.addEventListener("mouseleave", cancelHold);
+// Fallback: un semplice click completa comunque (accessibilità / desktop)
+scanBtn.addEventListener("click", () => { if(!scanning) runScan(); });
+
+// Chiude ogni overlay di scansione e passa alla Fase 2
+function finishScan(cleanup){
+  if(typeof cleanup === "function") cleanup();
+  overlay.classList.remove("show");
+  faceOverlay.classList.remove("show");
+  buzz(60);
+  showScreen("screen-auth");             // → Fase 2
+}
+
+async function runScan(){
+  if(scanning) return;
+  scanning = true;
+  cancelAnimationFrame(holdRAF);
+  scanFill.style.width = "100%";
+  buzz([100,50,100,50,180]);             // 📳 pattern di vibrazione richiesto
+
+  // 1) Prova FaceID: chiede la fotocamera frontale (solo su HTTPS, es. GitHub Pages)
+  let stream = null;
+  if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia){
+    try{
+      stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:"user" }, audio:false });
+    }catch(err){ stream = null; }  // permesso negato o fotocamera assente → fallback
+  }
+
+  if(stream){ faceScan(stream); }        // FaceID disponibile
+  else       { fingerScan(); }           // Fallback impronta/radar
+}
+
+// --- FaceID: anteprima live + reticolo, poi sblocco ---
+function faceScan(stream){
+  faceVideo.srcObject = stream;
+  faceVideo.play().catch(()=>{});
+  faceOverlay.classList.add("show");
+  buzz([80,40,80]);
+
+  const phrases = ["Rilevamento volto…","Mappatura 468 punti facciali…","Verifica anti-spoofing…","Identità confermata ✓"];
+  let pi = 0;
+  const iv = setInterval(() => {
+    faceStatus.textContent = phrases[pi++ % phrases.length];
+    buzz(20);
+  }, 700);
+
+  setTimeout(() => finishScan(() => {
+    clearInterval(iv);
+    stream.getTracks().forEach(t => t.stop());  // spegne subito la fotocamera
+    faceVideo.srcObject = null;
+  }), 2900);
+}
+
+// --- Fallback impronta: radar/laser verde ---
+function fingerScan(){
+  overlay.classList.add("show");
+  const phrases = ["Analisi impronta…","Confronto DNA con database Bronte…","Verifica livello glicemico…","Autenticazione in corso…"];
+  let pi = 0;
+  const iv = setInterval(() => { scanStatus.textContent = phrases[pi++ % phrases.length]; }, 650);
+  setTimeout(() => finishScan(() => clearInterval(iv)), 2600);
+}
+
+/* ---------- FASE 2: selezione ruolo + quiz ---------- */
+const roles   = document.getElementById("roles");
+const quizBox = document.getElementById("quizBox");
+const qText   = document.getElementById("qText");
+const qOpts   = document.getElementById("qOptions");
+const qAlert  = document.getElementById("qAlert");
+const qBack   = document.getElementById("qBack");
+let attempts = 0, currentQuiz = null;
+
+roles.addEventListener("click", (e) => {
+  const btn = e.target.closest(".role-btn");
+  if(!btn) return;
+  buzz(25);
+  document.querySelectorAll(".role-btn").forEach(b => b.classList.remove("sel"));
+  btn.classList.add("sel");
+  loadQuiz(btn.dataset.role);
+});
+
+function loadQuiz(role){
+  currentQuiz = CONFIG.quiz[role];
+  attempts = 0;
+  qAlert.classList.remove("show");
+  qText.textContent = currentQuiz.q;
+  qOpts.innerHTML = "";
+  currentQuiz.opts.forEach((opt, i) => {
+    const b = document.createElement("button");
+    b.className = "opt";
+    b.innerHTML = '<span class="k">'+String.fromCharCode(65+i)+'.</span><span>'+opt+'</span>';
+    b.addEventListener("click", () => answer(i, b));
+    qOpts.appendChild(b);
+  });
+  roles.style.display = "none";
+  quizBox.style.display = "block";
+}
+
+function answer(i, btnEl){
+  const correct = (i === currentQuiz.correct);
+  // Al 2° tentativo lasciamo passare comunque (nessun ospite resta bloccato)
+  if(correct || attempts >= 1){
+    btnEl.classList.add("right");
+    buzz([60,40,120]);
+    setTimeout(grantAccess, 480);
+  } else {
+    attempts++;
+    btnEl.classList.add("wrong");
+    buzz([160,60,160]);
+    qAlert.textContent = currentQuiz.wrong;
+    qAlert.classList.add("show");
+    setTimeout(() => btnEl.classList.remove("wrong"), 500);
+  }
+}
+
+qBack.addEventListener("click", () => {
+  quizBox.style.display = "none";
+  roles.style.display = "flex";
+  document.querySelectorAll(".role-btn").forEach(b => b.classList.remove("sel"));
+});
+
+/* ---------- Transizione ACCESS GRANTED → Festa ---------- */
+const grantOverlay = document.getElementById("grantOverlay");
+function grantAccess(){
+  grantOverlay.classList.add("show");
+  buzz([100,50,100,50,100,50,250]);
+  setTimeout(() => {
+    grantOverlay.classList.remove("show");
+    showScreen("screen-party");           // → Fase 3
+    initParty();
+  }, 1500);
+}
+
+/* ---------- FASE 3: counter animati + cucchiaino ---------- */
+const jarEl  = document.getElementById("jarCount");
+const glicEl = document.getElementById("glicCount");
+const hackBtn= document.getElementById("hackBtn");
+const hackMsg= document.getElementById("hackMsg");
+const MSGS = [
+  "Payload zuccherino iniettato ✅",
+  "Buffer overflow di pistacchio 🟢",
+  "Glicemia: privilege escalation 📈",
+  "Commit: 'aggiunto cucchiaino' 🍯",
+  "Warning: crema quasi finita 😋",
+  "root@dolci: accesso concesso 🔓"
+];
+
+// Piccola animazione di conteggio all'ingresso
+function countTo(el, to){
+  let from = parseInt(el.textContent) || 0;
+  const dur = 900, t0 = performance.now();
+  (function tick(now){
+    const p = Math.min((now-t0)/dur, 1);
+    el.textContent = Math.round(from + (to-from)*p);
+    if(p<1) requestAnimationFrame(tick);
+  })(performance.now());
+}
+let partyInit = false;
+function initParty(){
+  if(partyInit) return; partyInit = true;
+  countTo(jarEl, jars);
+  countTo(glicEl, glic);
+  loadPhotos();                          // popola il muro foto dalla cartella photos/
+}
+
+/* ---------- FASE 3: MURO FOTO (immagini locali da photos/) ---------- */
+const photoGrid = document.getElementById("photoGrid");
+
+function loadPhotos(){
+  const list = Array.isArray(CONFIG.photos) ? CONFIG.photos : [];
+  if(list.length === 0) return;          // nessuna foto → restano i segnaposto "＋"
+  photoGrid.innerHTML = "";
+  const cells = Math.max(6, list.length); // riempi almeno 6 celle
+  for(let i=0; i<cells; i++){
+    if(list[i]){
+      const a = document.createElement("a");
+      a.href = list[i]; a.target = "_blank"; a.rel = "noopener";
+      const img = document.createElement("img");
+      img.loading = "lazy"; img.alt = "Foto della festa"; img.src = list[i];
+      // se un file manca/non carica, la cella torna un segnaposto invece di rompersi
+      img.onerror = () => { a.replaceWith(makePlaceholder()); };
+      a.appendChild(img); photoGrid.appendChild(a);
+    }else if(i < 6){
+      photoGrid.appendChild(makePlaceholder());
+    }
+  }
+}
+function makePlaceholder(){
+  const d = document.createElement("div"); d.className = "ph"; d.textContent = "＋"; return d;
+}
+
+hackBtn.addEventListener("click", () => {
+  buzz(35);
+  glic += Math.floor(6 + Math.random()*10);     // la glicemia sale
+  if(jars > 0 && Math.random() > 0.45) jars--;   // ogni tanto sparisce un vasetto
+  glicEl.textContent = glic;
+  jarEl.textContent  = Math.max(jars,0);
+  glicEl.style.transform = "scale(1.18)";
+  setTimeout(() => glicEl.style.transform = "scale(1)", 150);
+  hackMsg.textContent = MSGS[Math.floor(Math.random()*MSGS.length)];
+});
+glicEl.style.transition = "transform .15s ease";
+</script>
+</body>
+</html>
