@@ -145,14 +145,32 @@ button{ font-family:inherit; color:inherit; cursor:pointer; border:none; backgro
   box-shadow:0 0 0 rgba(143,209,79,0);
 }
 .scan-btn:active{ transform:scale(.98); }
-.scan-btn.armed{ box-shadow:0 0 28px rgba(143,209,79,.35); }
+.scan-btn.armed{ box-shadow:0 0 28px rgba(143,209,79,.35); animation:none; }
+/* Anello che pulsa: attira l'attenzione sul "premi qui" finché non interagisci */
+.scan-btn:not(.armed){ animation:holdPulse 2.1s ease-in-out infinite; }
+@keyframes holdPulse{
+  0%,100%{ box-shadow:0 0 0 0 rgba(143,209,79,.38), 0 0 16px rgba(143,209,79,.10); }
+  55%    { box-shadow:0 0 0 8px rgba(143,209,79,0),   0 0 26px rgba(143,209,79,.28); }
+}
 .fingerprint{ font-size:26px; filter:drop-shadow(0 0 8px rgba(143,209,79,.5)); }
 .scan-icons{ display:flex; align-items:center; gap:7px; position:relative; z-index:1; }
 .scan-sep{ font-size:20px; opacity:.45; font-weight:400; }
 .faceid-ico{ width:25px; height:25px; filter:drop-shadow(0 0 8px rgba(143,209,79,.5)); }
 /* Barra di avanzamento pressione */
 .scan-fill{ position:absolute; inset:0; background:rgba(143,209,79,.22); width:0%; transition:width .05s linear; }
-.scan-hint{ font-size:11px; color:var(--phosphor-dim); letter-spacing:.14em; text-transform:uppercase; }
+/* Demo automatica: la barra si riempie in loop per suggerire "tieni premuto" */
+.scan-fill.demo{ animation:ghostFill 2.4s ease-in-out infinite; }
+@keyframes ghostFill{ 0%{ width:0 } 42%{ width:44% } 60%{ width:44% } 100%{ width:0 } }
+
+/* Suggerimento animato con dito che preme */
+.scan-hint{ display:flex; align-items:center; justify-content:center; gap:8px;
+  font-size:12px; color:var(--phosphor); letter-spacing:.14em; text-transform:uppercase;
+  animation:hintPulse 2.1s ease-in-out infinite; }
+.scan-hint.done{ animation:none; color:var(--phosphor-dim); }
+.press-finger{ display:inline-block; font-size:16px; animation:pressDown 1.3s ease-in-out infinite; }
+.scan-hint.done .press-finger{ animation:none; }
+@keyframes pressDown{ 0%,100%{ transform:translateY(-3px) } 45%,60%{ transform:translateY(3px) scale(.88) } }
+@keyframes hintPulse{ 50%{ opacity:.5 } }
 
 /* Overlay radar/laser durante la scansione */
 #scanOverlay{
@@ -356,7 +374,7 @@ button{ font-family:inherit; color:inherit; cursor:pointer; border:none; backgro
 
     <div class="ransom">
       <div class="lock">🔒</div>
-      <h1>⚠ <span class="glitch">CREMA-LOCKER</span> v2.0 — i tuoi cucchiaini sono stati cifrati</h1>
+      <h1>⚠ LAUREA - <span class="glitch">FOGUVA</span> v2.0</h1>
       <p>Rilevato tentativo di bypass del buffet. Per decifrare il vasetto di crema è richiesta l'autenticazione biometrica dell'ospite.</p>
     </div>
 
@@ -367,7 +385,7 @@ button{ font-family:inherit; color:inherit; cursor:pointer; border:none; backgro
 
     <div class="scan-cta">
       <button id="scanBtn" class="scan-btn" aria-label="Esegui scansione biometrica: impronta o Face ID">
-        <span class="scan-fill" id="scanFill"></span>
+        <span class="scan-fill demo" id="scanFill"></span>
         <span class="scan-icons">
           <span class="fingerprint">🫆</span>
           <span class="scan-sep">/</span>
@@ -386,7 +404,10 @@ button{ font-family:inherit; color:inherit; cursor:pointer; border:none; backgro
         </span>
         <span>Esegui scansione biometrica</span>
       </button>
-      <div class="scan-hint">tieni premuto · impronta / faceid</div>
+      <div class="scan-hint" id="scanHint">
+        <span class="press-finger">👇</span>
+        <span>tieni premuto per scansionare</span>
+      </div>
     </div>
   </div>
 </section>
@@ -619,6 +640,7 @@ printLog();
 /* ---------- FASE 1: bottone scansione (tieni premuto o click) ---------- */
 const scanBtn   = document.getElementById("scanBtn");
 const scanFill  = document.getElementById("scanFill");
+const scanHint  = document.getElementById("scanHint");
 const overlay   = document.getElementById("scanOverlay");
 const scanStatus= document.getElementById("scanStatus");
 const faceOverlay = document.getElementById("faceOverlay");
@@ -630,6 +652,8 @@ let holdRAF = null, holdStart = 0, scanning = false;
 function startHold(e){
   if(scanning) return;
   e.preventDefault();
+  scanFill.classList.remove("demo");     // ferma la demo automatica della barra
+  scanHint.classList.add("done");        // ferma dito animato + pulsazione hint
   scanBtn.classList.add("armed");
   buzz(30);
   holdStart = performance.now();
