@@ -274,6 +274,52 @@ button{ font-family:inherit; color:inherit; cursor:pointer; border:none; backgro
 .alert-neg.show{ display:block; animation:fadeIn .3s; }
 .back-link{ text-align:center; color:var(--phosphor-dim); font-size:12px; margin-top:4px; text-decoration:underline; }
 
+/* --- Indizio CTF: sembra un log di debug lasciato per errore --- */
+.ctf-hint{ margin-top:18px; border:1px dashed rgba(79,224,209,.3); border-radius:10px;
+  background:rgba(79,224,209,.04); padding:10px 12px; }
+.ctf-hint-title{ font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--cyan); opacity:.85; }
+.ctf-hint-sub{ font-size:10.5px; color:var(--phosphor-dim); margin-top:3px; }
+.ctf-code{ margin-top:7px; font-family:var(--mono); font-size:10.5px; line-height:1.5; color:rgba(207,238,203,.65);
+  white-space:pre-wrap; word-break:break-word; }
+
+/* --- Modale flag CTF (stile terminale scuro) --- */
+.ctf-modal{ position:fixed; inset:0; z-index:90; display:none; align-items:center; justify-content:center;
+  background:rgba(3,8,4,.92); padding:22px; }
+.ctf-modal.show{ display:flex; animation:fadeIn .3s ease; }
+.ctf-card{ width:100%; max-width:380px; border:1px solid rgba(143,209,79,.4); border-radius:16px;
+  background:linear-gradient(180deg, rgba(143,209,79,.09), rgba(3,8,4,.9)); padding:26px 22px;
+  text-align:center; box-shadow:0 0 50px rgba(143,209,79,.15); animation:grantPop .45s cubic-bezier(.2,1.4,.4,1); }
+.ctf-glow{ font-size:38px; filter:drop-shadow(0 0 14px rgba(143,209,79,.6)); margin-bottom:6px; }
+.ctf-line.ok{ font-family:var(--mono); font-weight:700; font-size:17px; color:var(--phosphor);
+  text-shadow:0 0 16px rgba(143,209,79,.5); margin-bottom:14px; }
+.ctf-row{ font-family:var(--mono); font-size:13px; color:var(--ink); text-align:left;
+  border-top:1px dashed rgba(143,209,79,.25); padding:9px 2px; }
+.ctf-row span{ color:var(--phosphor-dim); margin-right:6px; }
+.ctf-row b{ color:var(--cyan); letter-spacing:.03em; word-break:break-all; }
+.ctf-msg{ font-size:12.5px; color:var(--phosphor-dim); line-height:1.5; margin-top:16px; }
+.ctf-card button{ margin-top:18px; width:100%; border:1.5px solid var(--phosphor); border-radius:12px;
+  background:rgba(143,209,79,.12); color:var(--phosphor); font-family:var(--mono); font-weight:700;
+  font-size:13.5px; padding:13px; letter-spacing:.02em; transition:transform .1s ease, filter .2s; }
+.ctf-card button:active{ transform:scale(.98); filter:brightness(1.1); }
+
+/* Step nome: input testo + bottone conferma */
+.name-input{
+  width:100%; border:1px solid rgba(207,238,203,.25); border-radius:11px;
+  background:rgba(255,255,255,.03); color:#fff; font-family:var(--mono);
+  font-size:16px; padding:14px 14px; margin-bottom:12px;
+}
+.name-input::placeholder{ color:var(--phosphor-dim); }
+.name-input:focus{ outline:none; border-color:var(--phosphor); box-shadow:0 0 0 3px rgba(143,209,79,.15); }
+.confirm-btn{
+  width:100%; text-align:center; border:1.5px solid var(--phosphor); border-radius:12px;
+  background:rgba(143,209,79,.12); color:var(--phosphor); font-weight:700; font-size:14px;
+  padding:15px; letter-spacing:.02em; transition:transform .1s ease, filter .2s;
+}
+.confirm-btn:active{ transform:scale(.98); filter:brightness(1.1); }
+.confirm-btn:disabled{ border-color:rgba(143,209,79,.25); background:rgba(143,209,79,.04);
+  color:var(--phosphor-dim); cursor:not-allowed; filter:none; }
+.confirm-btn:disabled:active{ transform:none; }
+
 /* Overlay ACCESS GRANTED */
 #grantOverlay{ position:fixed; inset:0; z-index:60; display:none; align-items:center; justify-content:center;
   background:rgba(7,13,9,.96); flex-direction:column; gap:14px; }
@@ -313,9 +359,13 @@ button{ font-family:inherit; color:inherit; cursor:pointer; border:none; backgro
 
 .card{ background:#fff; border:1px solid rgba(95,143,78,.18); border-radius:18px; padding:20px;
   box-shadow:0 10px 30px -18px rgba(47,74,38,.5); }
-.thanks p{ font-size:15px; line-height:1.62; color:var(--party-ink); }
+.thanks p{ font-size:15px; line-height:1.62; color:var(--party-ink); min-height:1.62em; }
 .thanks p + p{ margin-top:12px; }
-.sign{ font-family:var(--serif); font-style:italic; font-size:20px; color:var(--pistachio-dk); margin-top:14px; text-align:right; }
+.sign{ font-family:var(--serif); font-style:italic; font-size:20px; color:var(--pistachio-dk); margin-top:14px; text-align:right; min-height:1.4em; }
+/* Cursore lampeggiante per l'effetto "scrittura da terminale" */
+.type-cursor{ display:inline-block; width:2px; height:1em; margin-left:2px; vertical-align:-.15em;
+  background:currentColor; animation:typeBlink .85s step-end infinite; }
+@keyframes typeBlink{ 50%{ opacity:0 } }
 
 /* Counter DB vasetti + glicemia */
 .counters{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
@@ -327,7 +377,32 @@ button{ font-family:inherit; color:inherit; cursor:pointer; border:none; backgro
   color:#fff; font-family:var(--mono); font-weight:700; font-size:14px; padding:16px; letter-spacing:.02em;
   transition:transform .1s ease, filter .2s; }
 .hack-btn:active{ transform:scale(.98); filter:brightness(1.08); }
+.hack-btn:disabled{ background:#c8c2b0; border-color:#c8c2b0; color:#8a8474; filter:none; cursor:not-allowed; }
+.hack-btn:disabled:active{ transform:none; }
 .hack-msg{ text-align:center; font-family:var(--mono); font-size:12px; color:var(--gold); min-height:16px; margin-top:2px; }
+
+/* --- Easter egg: pioggia di pistacchi/nocciole quando i vasetti finiscono --- */
+.confetti-piece{ position:fixed; top:-40px; font-size:22px; pointer-events:none; z-index:75;
+  animation:confettiFall linear forwards; will-change:transform; }
+@keyframes confettiFall{
+  from{ transform:translateY(-40px) rotate(0deg); opacity:1; }
+  to{   transform:translateY(112vh) rotate(360deg); opacity:.85; }
+}
+
+/* --- Modale "Complimenti da FOGUVA" --- */
+.empty-modal{ position:fixed; inset:0; z-index:80; display:none; align-items:center; justify-content:center;
+  background:rgba(47,74,38,.55); backdrop-filter:blur(2px); padding:24px; }
+.empty-modal.show{ display:flex; animation:fadeIn .3s ease; }
+.empty-card{ background:#fff; border-radius:20px; padding:30px 24px 26px; max-width:360px; width:100%;
+  text-align:center; box-shadow:0 20px 50px -20px rgba(47,74,38,.6); animation:grantPop .45s cubic-bezier(.2,1.4,.4,1); }
+.empty-emoji{ font-size:42px; line-height:1; margin-bottom:8px; }
+.empty-tag{ font-family:var(--mono); font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--pistachio); }
+.empty-card h3{ font-family:var(--serif); font-weight:600; font-size:23px; color:var(--pistachio-dk); margin:8px 0 10px; }
+.empty-card p{ font-size:14px; line-height:1.55; color:var(--party-ink); }
+.empty-card button{ margin-top:20px; width:100%; border:none; border-radius:14px; padding:14px;
+  background:var(--pistachio); color:#fff; font-family:var(--mono); font-weight:700; font-size:14px;
+  letter-spacing:.02em; transition:transform .1s ease, filter .2s; }
+.empty-card button:active{ transform:scale(.98); filter:brightness(1.08); }
 
 /* Widget placeholder: foto + playlist */
 .widget-head{ font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--pistachio); margin-bottom:10px; }
@@ -463,13 +538,32 @@ button{ font-family:inherit; color:inherit; cursor:pointer; border:none; backgro
       </button>
     </div>
 
+    <!-- Step nome: registra l'identità dell'ospite per il messaggio finale -->
+    <div class="quiz" id="nameBox" style="display:none;">
+      <div class="q-label">registrazione anagrafica · 1/1</div>
+      <div class="q-text">Inserisci solo il tuo nome</div>
+      <input type="text" id="nameInput" class="name-input" placeholder="Il tuo nome"
+             maxlength="40" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" />
+      <div class="alert-neg" id="nameAlert">Nice try, ma sei ancora utente guest</div>
+      <button class="confirm-btn" id="nameConfirm" disabled>Conferma identità →</button>
+      <div class="back-link" id="nameBack">← cambia livello di privilegio</div>
+
+      <!-- 🥚 piccolo indizio CTF: un "log di debug" lasciato per sbaglio -->
+      <div class="ctf-hint">
+        <div class="ctf-hint-title">Indizio CTF</div>
+        <div class="ctf-hint-sub">Input validation:</div>
+        <pre class="ctf-code">$query = "SELECT * FROM users
+                      WHERE nome = '" . $_POST['nome'] . " ' ":</pre>
+      </div>
+    </div>
+
     <!-- Quiz (popolato via JS) -->
     <div class="quiz" id="quizBox" style="display:none;">
       <div class="q-label" id="qLabel">captcha umano · 1/1</div>
       <div class="q-text" id="qText"></div>
       <div id="qOptions"></div>
       <div class="alert-neg" id="qAlert"></div>
-      <div class="back-link" id="qBack">← cambia livello di privilegio</div>
+      <div class="back-link" id="qBack">← torna al tuo nome</div>
     </div>
   </div>
 </section>
@@ -479,6 +573,18 @@ button{ font-family:inherit; color:inherit; cursor:pointer; border:none; backgro
   <div class="big">ACCESS GRANTED</div>
   <small>decifratura crema completata</small>
   <div class="grant-bars"><i></i><i></i><i></i><i></i><i></i></div>
+</div>
+
+<!-- 🥚 Modale flag CTF: sbloccato solo con una vera SQL injection nel campo nome -->
+<div id="ctfModal" class="ctf-modal">
+  <div class="ctf-card">
+    <div class="ctf-glow">🔓</div>
+    <div class="ctf-line ok">Permessi di root ottenuti</div>
+    <div class="ctf-row"><span>status:</span>loggato come admin</div>
+    <div class="ctf-row"><span>flag:</span><b>SQL_1NJ3CT10N_M4ST3R</b></div>
+    <p class="ctf-msg">Hai sbloccato il premio: vai dal festeggiato e urlagli la flag!</p>
+    <button id="ctfClose">Chiudi</button>
+  </div>
 </div>
 
 <!-- ============================================================
@@ -495,12 +601,9 @@ button{ font-family:inherit; color:inherit; cursor:pointer; border:none; backgro
       <div class="sub">Laurea Magistrale · Ingegneria Informatica — Cybersecurity</div>
     </div>
 
-    <!-- 🔧 PERSONALIZZA QUI il messaggio di ringraziamento -->
+    <!-- 🔧 Il testo di ringraziamento si scrive da solo (effetto terminale) — vedi CONFIG.thanksLines -->
     <div class="card thanks">
-      <p>Grazie di cuore per essere qui a festeggiare questo traguardo con me. 🎓</p>
-      <p>Dietro ogni riga di codice e ogni notte insonne c'eravate voi: la mia rete di sicurezza più affidabile, il mio backup quando tutto sembrava andare in crash. Questo vasetto di crema siciliana è un piccolo grazie, cifrato con affetto e servito in cassetta della frutta stampata in 3D.</p>
-      <p>Godetevi la festa, il buffet è ufficialmente <b>senza firewall</b>. 🍕</p>
-      <div class="sign">— con gratitudine, il neodottore</div>
+      <div id="thanksTerminal"></div>
     </div>
 
     <!-- Counter: vasetti nel DB + glicemia -->
@@ -514,7 +617,7 @@ button{ font-family:inherit; color:inherit; cursor:pointer; border:none; backgro
         <div class="num glic" id="glicCount">90</div>
       </div>
     </div>
-    <button class="hack-btn" id="hackBtn">🥄 Hackera un altro cucchiaino</button>
+    <button class="hack-btn" id="hackBtn">🥄 Mangia un altro cucchiaino</button>
     <div class="hack-msg" id="hackMsg"></div>
 
     <!-- Widget foto (immagini locali dalla cartella photos/) + playlist -->
@@ -533,6 +636,17 @@ button{ font-family:inherit; color:inherit; cursor:pointer; border:none; backgro
   </div>
 </section>
 
+<!-- Easter egg: quando i vasetti finiscono -->
+<div id="emptyModal" class="empty-modal">
+  <div class="empty-card">
+    <div class="empty-emoji">🎉</div>
+    <div class="empty-tag">— messaggio da FOGUVA —</div>
+    <h3>Complimenti!</h3>
+    <p>Hai prosciugato il database dei vasetti. Vai a fare un brindisi con il festeggiato, in qualunque momento della festa si trovi. 🥂</p>
+    <button id="emptyClose">Ci vado subito!</button>
+  </div>
+</div>
+
 <script>
 /* =====================================================================
    ⚙️  CONFIGURAZIONE  —  MODIFICA SOLO QUESTA PARTE
@@ -543,6 +657,21 @@ const CONFIG = {
   nomeFesteggiato: "Fortunato Guglielmo Varisco",   // 🔧 il tuo nome
   vasettiIniziali: 42,                 // 🔧 quanti vasetti "nel database"
   glicemiaIniziale: 90,                // 🔧 punto di partenza (mg/dL)
+
+  // 🔧 RINGRAZIAMENTO — si scrive da solo come su un terminale.
+  //    La prima riga usa {nome} come segnaposto per il nome scritto dall'ospite
+  //    (se lo lascia vuoto, uso automaticamente la versione senza nome).
+  //    Le righe successive: { t:"testo" } normale, { t:"testo", b:true } grassetto.
+  //    L'ultima riga (signature:true) viene scritta per ultima, in corsivo.
+  thanksIntro: {
+    withName:    "Grazie di cuore, {nome}, per essere qui a festeggiare questo traguardo con me. 🎓",
+    withoutName: "Grazie di cuore per essere qui a festeggiare questo traguardo con me. 🎓"
+  },
+  thanksLines: [
+    { chunks:[ { t:"Dietro ogni riga di codice e ogni notte insonne c'eravate voi: la mia rete di sicurezza più affidabile, il mio backup quando tutto sembrava andare in crash. Questo vasetto di crema siciliana è un piccolo grazie, cifrato con affetto e servito in cassetta della frutta stampata in 3D." } ] },
+    { chunks:[ { t:"Godetevi la festa, il buffet è ufficialmente " }, { t:"senza firewall", b:true }, { t:". 🍕" } ] },
+    { chunks:[ { t:"— con gratitudine, il neodottore" } ], signature:true }
+  ],
   linkMusica:"#",                      // 🔧 URL playlist (es. Spotify)
 
   // 🔧 MURO FOTO — elenca i file che metti nella cartella "photos/" della repo.
@@ -619,10 +748,7 @@ const TAGS = { info:["INFO","tag-info"], ok:["OK","tag-ok"], warn:["WARN","tag-w
 let li = 0;
 function printLog(){
   if(li >= CONFIG.bootLog.length){
-    const c = document.createElement("div");
-    c.className = "line muted";
-    c.innerHTML = '$ waiting_biometric_auth <span class="caret"></span>';
-    logEl.appendChild(c);
+    typeFinalLine("waiting_biometric_auth");
     return;
   }
   const item = CONFIG.bootLog[li++];
@@ -636,6 +762,30 @@ function printLog(){
   setTimeout(printLog, 190 + Math.random()*160);
 }
 printLog();
+
+// Scrive la riga finale del terminale carattere per carattere, come se venisse digitata dal vivo
+function typeFinalLine(text){
+  const row = document.createElement("div");
+  row.className = "line muted";
+  const prefix = document.createTextNode("$ ");
+  const typed = document.createElement("span");
+  const caret = document.createElement("span");
+  caret.className = "caret";
+  row.appendChild(prefix);
+  row.appendChild(typed);
+  row.appendChild(caret);
+  logEl.appendChild(row);
+  logEl.parentElement.scrollTop = logEl.parentElement.scrollHeight;
+
+  let ci = 0;
+  (function typeChar(){
+    if(ci < text.length){
+      typed.textContent += text.charAt(ci++);
+      logEl.parentElement.scrollTop = logEl.parentElement.scrollHeight;
+      setTimeout(typeChar, 55 + Math.random()*70);   // ritmo irregolare, tipo battitura reale
+    }
+  })();
+}
 
 /* ---------- FASE 1: bottone scansione (tieni premuto o click) ---------- */
 const scanBtn   = document.getElementById("scanBtn");
@@ -739,14 +889,18 @@ function fingerScan(){
   setTimeout(() => finishScan(() => clearInterval(iv)), 2600);
 }
 
-/* ---------- FASE 2: selezione ruolo + quiz ---------- */
+/* ---------- FASE 2: selezione ruolo → nome → quiz ---------- */
 const roles   = document.getElementById("roles");
+const nameBox = document.getElementById("nameBox");
+const nameInput   = document.getElementById("nameInput");
+const nameConfirm = document.getElementById("nameConfirm");
+const nameBack    = document.getElementById("nameBack");
 const quizBox = document.getElementById("quizBox");
 const qText   = document.getElementById("qText");
 const qOpts   = document.getElementById("qOptions");
 const qAlert  = document.getElementById("qAlert");
 const qBack   = document.getElementById("qBack");
-let attempts = 0, currentQuiz = null;
+let attempts = 0, currentQuiz = null, pendingRole = null, guestName = "";
 
 roles.addEventListener("click", (e) => {
   const btn = e.target.closest(".role-btn");
@@ -754,8 +908,82 @@ roles.addEventListener("click", (e) => {
   buzz(25);
   document.querySelectorAll(".role-btn").forEach(b => b.classList.remove("sel"));
   btn.classList.add("sel");
-  loadQuiz(btn.dataset.role);
+  pendingRole = btn.dataset.role;
+  showNameStep();
 });
+
+function showNameStep(){
+  roles.style.display = "none";
+  nameBox.style.display = "block";
+  nameInput.value = guestName;             // se torna indietro, ritrova ciò che aveva scritto
+  nameAlert.classList.remove("show");
+  impersonationWarned = false;
+  updateConfirmState();
+  setTimeout(() => nameInput.focus(), 300); // dopo la transizione di schermata
+}
+
+function confirmName(){
+  if(nameConfirm.disabled) return;         // blocco: nome vuoto o admin/root
+  const raw = nameInput.value.trim().slice(0, 24).toLowerCase();
+  guestName = raw ? raw.charAt(0).toUpperCase() + raw.slice(1) : "";  // Es. "GIULIA" o "giulia" → "Giulia"
+  buzz(25);
+  nameBox.style.display = "none";
+  nameAlert.classList.remove("show");
+  loadQuiz(pendingRole);
+}
+nameConfirm.addEventListener("click", confirmName);
+nameInput.addEventListener("keydown", (e) => { if(e.key === "Enter") confirmName(); });
+
+nameBack.addEventListener("click", () => {
+  nameBox.style.display = "none";
+  roles.style.display = "flex";
+  document.querySelectorAll(".role-btn").forEach(b => b.classList.remove("sel"));
+});
+
+/* ---------- 🥚 Easter egg CTF: SQL injection nel campo nome ---------- */
+const ctfModal = document.getElementById("ctfModal");
+const ctfClose = document.getElementById("ctfClose");
+let ctfFired = false;
+
+// Normalizza: minuscolo, apici curvi/dritti/backtick tutti uguali, e spazi rimossi del tutto
+// (così "' OR 1=1", "'or1=1", "‘ Or  1 = 1" ecc. vengono riconosciuti allo stesso modo)
+function normalizeForCtf(s){
+  return s
+    .toLowerCase()
+    .replace(/[\u2018\u2019\u201B\u2032\u00B4`]/g, "'")
+    .replace(/\s+/g, "");
+}
+nameInput.addEventListener("input", () => {
+  if(ctfFired) return;
+  if(normalizeForCtf(nameInput.value).includes("'or1=1")){
+    ctfFired = true;
+    buzz([100,50,100,50,220]);
+    ctfModal.classList.add("show");
+  }
+});
+ctfClose.addEventListener("click", () => {
+  buzz(25);
+  ctfModal.classList.remove("show");
+});
+
+/* ---------- 🥚 Easter egg: chi prova a scrivere "admin" o "root" viene smascherato ---------- */
+/* Stesso controllo blocca anche l'avanzamento: campo vuoto, "admin" o "root" → niente accesso */
+const nameAlert = document.getElementById("nameAlert");
+let impersonationWarned = false;
+
+function updateConfirmState(){
+  const v = nameInput.value.trim().toLowerCase();
+  const tryingImpersonation = v.includes("admin") || v.includes("root");
+  const isEmpty = v.length === 0;
+  nameAlert.classList.toggle("show", tryingImpersonation);
+  nameConfirm.disabled = tryingImpersonation || isEmpty;
+  if(tryingImpersonation && !impersonationWarned){
+    impersonationWarned = true;
+    buzz([120,60,120]);
+  }
+  if(!tryingImpersonation) impersonationWarned = false;
+}
+nameInput.addEventListener("input", updateConfirmState);
 
 function loadQuiz(role){
   currentQuiz = CONFIG.quiz[role];
@@ -770,7 +998,6 @@ function loadQuiz(role){
     b.addEventListener("click", () => answer(i, b));
     qOpts.appendChild(b);
   });
-  roles.style.display = "none";
   quizBox.style.display = "block";
 }
 
@@ -793,8 +1020,7 @@ function answer(i, btnEl){
 
 qBack.addEventListener("click", () => {
   quizBox.style.display = "none";
-  roles.style.display = "flex";
-  document.querySelectorAll(".role-btn").forEach(b => b.classList.remove("sel"));
+  showNameStep();
 });
 
 /* ---------- Transizione ACCESS GRANTED → Festa ---------- */
@@ -839,6 +1065,57 @@ function initParty(){
   countTo(jarEl, jars);
   countTo(glicEl, glic);
   loadPhotos();                          // popola il muro foto dalla cartella photos/
+  typeThanks();                          // scrive il ringraziamento stile terminale
+  if(jars <= 0) lockHackBtn();           // caso limite: si parte già a zero vasetti
+}
+
+/* ---------- FASE 3: RINGRAZIAMENTO scritto come su un terminale ---------- */
+const thanksTerminal = document.getElementById("thanksTerminal");
+
+function typeThanks(){
+  const introText = guestName
+    ? CONFIG.thanksIntro.withName.replace("{nome}", guestName)
+    : CONFIG.thanksIntro.withoutName;
+  const introLine = { chunks:[ { t: introText } ] };
+  const lines = [ introLine, ...(CONFIG.thanksLines || []) ];
+  let li = 0;
+
+  function nextLine(){
+    if(li >= lines.length) return;
+    const line = lines[li++];
+    const el = document.createElement(line.signature ? "div" : "p");
+    if(line.signature) el.className = "sign";
+    thanksTerminal.appendChild(el);
+
+    const cursor = document.createElement("span");
+    cursor.className = "type-cursor";
+    el.appendChild(cursor);
+
+    typeChunks(el, cursor, line.chunks, 0, 0, () => {
+      cursor.remove();                    // il cursore resta solo sulla riga attiva
+      setTimeout(nextLine, 380);          // piccola pausa prima della riga successiva
+    });
+  }
+
+  function typeChunks(el, cursor, chunks, ci, gi, onDone){
+    if(ci >= chunks.length){ onDone(); return; }
+    const chunk = chunks[ci];
+    const graphemes = Array.from(chunk.t);           // rispetta le emoji multi-byte
+    if(gi === 0 && chunk.b){
+      chunk._wrap = document.createElement("b");
+      el.insertBefore(chunk._wrap, cursor);
+    }
+    if(gi >= graphemes.length){ typeChunks(el, cursor, chunks, ci+1, 0, onDone); return; }
+
+    const target = chunk.b ? chunk._wrap : el;
+    target.insertBefore(document.createTextNode(graphemes[gi]), chunk.b ? null : cursor);
+
+    const ch = graphemes[gi];
+    const pause = ",.!?—".includes(ch) ? 130 : 16 + Math.random()*26; // respiro sulla punteggiatura
+    setTimeout(() => typeChunks(el, cursor, chunks, ci, gi+1, onDone), pause);
+  }
+
+  nextLine();
 }
 
 /* ---------- FASE 3: MURO FOTO (immagini locali da photos/) ---------- */
@@ -868,6 +1145,7 @@ function makePlaceholder(){
 }
 
 hackBtn.addEventListener("click", () => {
+  if(hackBtn.disabled) return;
   buzz(35);
   glic += Math.floor(6 + Math.random()*10);     // la glicemia sale
   if(jars > 0 && Math.random() > 0.45) jars--;   // ogni tanto sparisce un vasetto
@@ -876,8 +1154,49 @@ hackBtn.addEventListener("click", () => {
   glicEl.style.transform = "scale(1.18)";
   setTimeout(() => glicEl.style.transform = "scale(1)", 150);
   hackMsg.textContent = MSGS[Math.floor(Math.random()*MSGS.length)];
+
+  if(jars <= 0) lockHackBtn();
 });
 glicEl.style.transition = "transform .15s ease";
+
+/* ---------- Easter egg: i vasetti finiscono ---------- */
+const emptyModal = document.getElementById("emptyModal");
+const emptyClose = document.getElementById("emptyClose");
+let jarsEmptyFired = false;
+
+function lockHackBtn(){
+  hackBtn.disabled = true;
+  hackBtn.textContent = "🫙 Vasetti esauriti";
+  if(jarsEmptyFired) return;             // l'easter egg scatta una sola volta
+  jarsEmptyFired = true;
+  buzz([80,40,80,40,160]);
+  rainPistachios();
+  setTimeout(() => emptyModal.classList.add("show"), 700);
+}
+
+emptyClose.addEventListener("click", () => {
+  buzz(30);
+  emptyModal.classList.remove("show");
+});
+
+// Pioggia di pistacchi 🥜 e nocciole 🌰 che cadono dall'alto
+function rainPistachios(){
+  const items = ["🥜","🌰"];
+  const count = 46;
+  for(let i=0; i<count; i++){
+    setTimeout(() => {
+      const el = document.createElement("span");
+      el.className = "confetti-piece";
+      el.textContent = items[Math.floor(Math.random()*items.length)];
+      const dur = 2.4 + Math.random()*1.8;
+      el.style.left = (Math.random()*100) + "vw";
+      el.style.fontSize = (16 + Math.random()*14) + "px";
+      el.style.animationDuration = dur + "s";
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), dur*1000 + 100);
+    }, i * 45);
+  }
+}
 </script>
 </body>
 </html>
