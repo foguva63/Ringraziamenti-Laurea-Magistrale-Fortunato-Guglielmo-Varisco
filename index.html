@@ -162,6 +162,24 @@ button{ font-family:inherit; color:inherit; cursor:pointer; border:none; backgro
 .scan-fill.demo{ animation:ghostFill 2.4s ease-in-out infinite; }
 @keyframes ghostFill{ 0%{ width:0 } 42%{ width:44% } 60%{ width:44% } 100%{ width:0 } }
 
+/* "Dito fantasma": scende sul bottone, resta premuto, poi si solleva — mostra il gesto reale */
+.ghost-touch{
+  position:absolute; left:50%; top:50%; width:46px; height:46px; margin:-23px 0 0 -23px;
+  border-radius:50%; pointer-events:none; z-index:2; opacity:0;
+  background:radial-gradient(circle, rgba(255,255,255,.65) 0%, rgba(255,255,255,.24) 55%, transparent 76%);
+  mix-blend-mode:screen;
+  animation:ghostTouch 2.4s ease-in-out infinite;
+}
+.scan-btn.armed .ghost-touch{ display:none; }
+@keyframes ghostTouch{
+  0%   { opacity:0;  transform:translateY(-54px) scale(.6); }
+  9%   { opacity:.9; transform:translateY(-54px) scale(.6); }
+  22%  { opacity:1;  transform:translateY(0) scale(1); }      /* atterra sul bottone */
+  60%  { opacity:1;  transform:translateY(0) scale(.86); }    /* resta premuto */
+  74%  { opacity:0;  transform:translateY(-14px) scale(.6); } /* si solleva */
+  100% { opacity:0;  transform:translateY(-54px) scale(.6); }
+}
+
 /* Suggerimento animato con dito che preme */
 .scan-hint{ display:flex; align-items:center; justify-content:center; gap:8px;
   font-size:12px; color:var(--phosphor); letter-spacing:.14em; text-transform:uppercase;
@@ -450,7 +468,7 @@ button{ font-family:inherit; color:inherit; cursor:pointer; border:none; backgro
     <div class="ransom">
       <div class="lock">🔒</div>
       <h1>⚠ LAUREA - <span class="glitch">FOGUVA</span> v2.0</h1>
-      <p>Rilevato tentativo di bypass del buffet. Per decifrare il vasetto di crema è richiesta l'autenticazione biometrica dell'ospite.</p>
+      <p>Rilevato tentativo di bypass della cena. Per decifrare il vasetto di crema è richiesta l'autenticazione biometrica dell'ospite.</p>
     </div>
 
     <div class="terminal">
@@ -461,6 +479,7 @@ button{ font-family:inherit; color:inherit; cursor:pointer; border:none; backgro
     <div class="scan-cta">
       <button id="scanBtn" class="scan-btn" aria-label="Esegui scansione biometrica: impronta o Face ID">
         <span class="scan-fill demo" id="scanFill"></span>
+        <span class="ghost-touch" id="ghostTouch" aria-hidden="true"></span>
         <span class="scan-icons">
           <span class="fingerprint">🫆</span>
           <span class="scan-sep">/</span>
@@ -481,7 +500,7 @@ button{ font-family:inherit; color:inherit; cursor:pointer; border:none; backgro
       </button>
       <div class="scan-hint" id="scanHint">
         <span class="press-finger">👇</span>
-        <span>tieni premuto per scansionare</span>
+        <span>tieni premuto per ~1 secondo</span>
       </div>
     </div>
   </div>
@@ -669,19 +688,37 @@ const CONFIG = {
   },
   thanksLines: [
     { chunks:[ { t:"Dietro ogni riga di codice e ogni notte insonne c'eravate voi: la mia rete di sicurezza più affidabile, il mio backup quando tutto sembrava andare in crash. Questo vasetto di crema siciliana è un piccolo grazie, cifrato con affetto e servito in cassetta della frutta stampata in 3D." } ] },
-    { chunks:[ { t:"Godetevi la festa, il buffet è ufficialmente " }, { t:"senza firewall", b:true }, { t:". 🍕" } ] },
+    { chunks:[ { t:"Godetevi la festa, la cena è ufficialmente " }, { t:"senza firewall", b:true }, { t:". 🍕" } ] },
     { chunks:[ { t:"— con gratitudine, il neodottore" } ], signature:true }
   ],
   linkMusica:"#",                      // 🔧 URL playlist (es. Spotify)
 
-  // 🔧 MURO FOTO — elenca i file che metti nella cartella "photos/" della repo.
-  //    Carichi le immagini a mano su GitHub, poi aggiungi qui il loro nome.
-  //    Se lasci l'array vuoto [], il muro mostra i segnaposto "＋".
+  // 🔧 MURO FOTO — di default la pagina va da sola a vedere cosa c'è nella
+  //    cartella "photos/" della repo (tramite le API di GitHub) e mostra
+  //    ogni .jpg/.png che trova. Basta caricare le immagini su GitHub,
+  //    NON serve più elencarle qui.
+  //
+  //    Se per qualche motivo l'auto-rilevamento non dovesse funzionare
+  //    (es. troppe richieste contemporanee durante la festa), scrivi qui
+  //    i nomi dei file a mano: in quel caso viene usata SOLO questa lista
+  //    e l'auto-rilevamento viene saltato.
   photos: [
     // "photos/foto1.jpg",
     // "photos/foto2.jpg",
     // "photos/foto3.jpg",
   ],
+
+  // 🔧 Da dove leggere i file, se l'auto-rilevamento è attivo.
+  //    Lasciando tutto vuoto ("") la pagina prova a capirlo da sola
+  //    dall'indirizzo del sito (funziona su un normale *.github.io).
+  //    Compila questi campi solo se usi un dominio personalizzato
+  //    o se l'auto-rilevamento sbaglia proprietario/repo.
+  photosAutoDetect: {
+    owner:  "",     // es. "fortunatovarisco"
+    repo:   "",     // es. "festa-laurea"
+    branch: "main", // il branch da cui leggere (di solito "main")
+    folder: "photos"
+  },
 
   // Log del terminale (Fase 1). Aggiungi/rimuovi liberamente le righe.
   bootLog: [
@@ -691,8 +728,8 @@ const CONFIG = {
     { t:"info", m:"Handshake TLS con vasetto_bronte … stabilito" },
     { t:"warn", m:"Livello glicemico non autorizzato rilevato" },
     { t:"info", m:"Generazione chiave AES-256-BRONTE …" },
-    { t:"warn", m:"Scansione porte del buffet … 3 aperte" },
-    { t:"fail", m:"Rilevato tentativo di bypass del buffet!" },
+    { t:"warn", m:"Scansione porte della cena … 3 aperte" },
+    { t:"fail", m:"Rilevato tentativo di bypass della cena!" },
     { t:"info", m:"Deploy honeypot per parenti che chiedono 'e un lavoro vero?' …" },
     { t:"fail", m:"Accesso al vasetto NEGATO: autenticazione richiesta" }
   ],
@@ -713,7 +750,7 @@ const CONFIG = {
     },
     collega: {
       q: "Qual è il miglior modo per mitigare un attacco DDoS al tavolo dei dolci?",
-      opts: ["Configurare un Cloudflare protettivo davanti al buffet.", "Fare SQL Injection direttamente sul vasetto di pistacchio."],
+      opts: ["Configurare un Cloudflare protettivo davanti alla cena.", "Fare SQL Injection direttamente sul vasetto di pistacchio."],
       correct: 0,
       wrong: "ACCESSO NEGATO: quella è una vulnerabilità, non una difesa. Riprova, collega. 🧑‍💻"
     }
@@ -934,6 +971,20 @@ function confirmName(){
 nameConfirm.addEventListener("click", confirmName);
 nameInput.addEventListener("keydown", (e) => { if(e.key === "Enter") confirmName(); });
 
+/* Su mobile la tastiera copre il campo: lo scorriamo sopra appena si apre.
+   Il timeout dà tempo all'animazione della tastiera di completarsi prima di misurare lo spazio visibile. */
+nameInput.addEventListener("focus", () => {
+  setTimeout(() => { nameInput.scrollIntoView({ behavior:"smooth", block:"center" }); }, 350);
+});
+if(window.visualViewport){
+  // iOS ridimensiona il viewport visivo mentre la tastiera anima: ci riallineiamo anche lì
+  window.visualViewport.addEventListener("resize", () => {
+    if(document.activeElement === nameInput){
+      nameInput.scrollIntoView({ behavior:"smooth", block:"center" });
+    }
+  });
+}
+
 nameBack.addEventListener("click", () => {
   nameBox.style.display = "none";
   roles.style.display = "flex";
@@ -1118,20 +1169,63 @@ function typeThanks(){
   nextLine();
 }
 
-/* ---------- FASE 3: MURO FOTO (immagini locali da photos/) ---------- */
+/* ---------- FASE 3: MURO FOTO (auto-rilevate da GitHub, o lista manuale) ---------- */
 const photoGrid = document.getElementById("photoGrid");
 
-function loadPhotos(){
-  const list = Array.isArray(CONFIG.photos) ? CONFIG.photos : [];
-  if(list.length === 0) return;          // nessuna foto → restano i segnaposto "＋"
+async function loadPhotos(){
+  const manual = Array.isArray(CONFIG.photos) ? CONFIG.photos.filter(Boolean) : [];
+
+  // Se c'è una lista manuale compilata, ha sempre la precedenza (100% affidabile,
+  // zero chiamate di rete): salta del tutto l'auto-rilevamento.
+  if(manual.length > 0){ renderPhotos(manual); return; }
+
+  const urls = await autoDetectPhotos();
+  if(urls.length > 0) renderPhotos(urls);
+  // altrimenti restano i segnaposto "＋" iniziali, senza errori a schermo
+}
+
+// Chiede a GitHub cosa c'è nella cartella "photos/" e restituisce gli URL grezzi delle immagini
+async function autoDetectPhotos(){
+  const cfg = CONFIG.photosAutoDetect || {};
+  let owner = cfg.owner, repo = cfg.repo;
+  const branch = cfg.branch || "main";
+  const folder = cfg.folder || "photos";
+
+  // Se owner/repo non sono indicati a mano, li ricaviamo dall'indirizzo del sito
+  // (funziona sui normali siti *.github.io, sia "user page" che "project page").
+  if(!owner || !repo){
+    const host = location.hostname;                       // es. "fortunato.github.io"
+    if(!host.endsWith(".github.io")) return [];            // dominio diverso: serve configurare a mano
+    owner = host.split(".")[0];
+    const seg = location.pathname.split("/").filter(Boolean);
+    repo = seg.length > 0 ? seg[0] : (owner + ".github.io"); // project page vs user page
+  }
+
+  try{
+    const api = `https://api.github.com/repos/${owner}/${repo}/contents/${folder}?ref=${branch}`;
+    const res = await fetch(api, { headers:{ "Accept":"application/vnd.github+json" } });
+    if(!res.ok) return [];                                  // cartella assente, repo privata, rate limit…
+    const items = await res.json();
+    if(!Array.isArray(items)) return [];
+    return items
+      .filter(it => it.type === "file" && /\.(jpe?g|png)$/i.test(it.name))
+      .sort((a,b) => a.name.localeCompare(b.name))
+      .map(it => it.download_url);
+  }catch(err){
+    return [];                                              // nessuna rete / errore: fallback silenzioso
+  }
+}
+
+// Disegna la griglia: foto reali + segnaposto fino a riempire 6 celle
+function renderPhotos(urls){
   photoGrid.innerHTML = "";
-  const cells = Math.max(6, list.length); // riempi almeno 6 celle
+  const cells = Math.max(6, urls.length);
   for(let i=0; i<cells; i++){
-    if(list[i]){
+    if(urls[i]){
       const a = document.createElement("a");
-      a.href = list[i]; a.target = "_blank"; a.rel = "noopener";
+      a.href = urls[i]; a.target = "_blank"; a.rel = "noopener";
       const img = document.createElement("img");
-      img.loading = "lazy"; img.alt = "Foto della festa"; img.src = list[i];
+      img.loading = "lazy"; img.alt = "Foto della festa"; img.src = urls[i];
       // se un file manca/non carica, la cella torna un segnaposto invece di rompersi
       img.onerror = () => { a.replaceWith(makePlaceholder()); };
       a.appendChild(img); photoGrid.appendChild(a);
