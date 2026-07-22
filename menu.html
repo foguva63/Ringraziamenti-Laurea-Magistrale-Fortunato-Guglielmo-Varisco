@@ -46,9 +46,10 @@ body{
 
 /* ===== Intestazione ===== */
 .head{ text-align:center; margin-bottom:4px; }
-.head .eyebrow{ font-family:var(--mono); font-size:11.5px; letter-spacing:.22em; text-transform:uppercase; color:var(--gold); }
-.head h1{ font-family:var(--serif); font-weight:600; font-size:36px; line-height:1.05; margin:10px 0 6px; color:var(--pistachio-dk); }
-.head .sub{ font-family:var(--mono); font-size:12px; color:var(--pistachio); letter-spacing:.03em; }
+.head h1{ display:flex; align-items:center; justify-content:center; gap:10px;
+  font-family:var(--serif); font-weight:600; font-size:36px; line-height:1.05; margin:0 0 10px; color:var(--pistachio-dk); }
+.head-icon{ height:.85em; width:auto; display:block; filter:drop-shadow(0 2px 5px rgba(47,74,38,.25)); }
+.head .sub{ font-family:var(--mono); font-size:12px; color:var(--pistachio); letter-spacing:.03em; line-height:1.6; }
 
 /* ===== Card di ogni portata ===== */
 .card{ background:#fff; border:1px solid rgba(95,143,78,.18); border-radius:18px; padding:22px 20px;
@@ -62,9 +63,7 @@ body{
 .dish + .dish{ margin-top:14px; }
 .note{ font-family:var(--mono); font-size:12px; color:var(--gold); margin-top:12px; letter-spacing:.02em; }
 
-.or-divider{ display:flex; align-items:center; gap:10px; margin:16px 0; font-family:var(--mono);
-  font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--pistachio); opacity:.75; }
-.or-divider::before, .or-divider::after{ content:""; flex:1; height:1px; background:rgba(95,143,78,.25); }
+.divider{ width:64px; height:1px; background:linear-gradient(90deg, transparent, rgba(95,143,78,.45), transparent); margin:16px auto; }
 
 /* ===== Footer ===== */
 .footer{ text-align:center; font-family:var(--mono); font-size:11px; color:var(--pistachio); opacity:.75;
@@ -78,21 +77,25 @@ body{
 <div class="wrap">
 
   <div class="head">
-    <div class="eyebrow">— cena di laurea —</div>
-    <h1>Il Menu</h1>
-    <div class="sub">Dott. Fortunato Guglielmo Varisco</div>
+    <h1><img src="cappello.png" alt="" class="head-icon" onerror="this.style.display='none'">Menu</h1>
+    <div class="sub">Laurea Magistrale in<br>Ingegneria Informatica - Cybersecurity<br>Dott. Fortunato Guglielmo Varisco</div>
+  </div>
+
+  <div class="card">
+    <div class="course-label">Entrée di Benvenuto</div>
+    <p class="dish">Prosecco · Analcolici · Spritz · Gin Tonic · Verdurine pastellate · Sushi · Sicilia Croccante · Caponatina di pesce spada</p>
   </div>
 
   <div class="card">
     <div class="course-label">Antipasto</div>
-    <p class="dish">Tortino di salmone con mozzarella di bufala, cocktail di gamberi, insalata di mare, polpo scottato su purea di patate.</p>
+    <p class="dish">Tortino di salmone con mozzarella di bufala · Cocktail di gamberi · Insalata di mare · Polpo scottato su purea di patate</p>
     <p class="note">Frittura di paranza al centro tavola</p>
   </div>
 
   <div class="card">
     <div class="course-label">Primo</div>
-    <p class="dish">Riso gamberi e lime</p>
-    <div class="or-divider">oppure</div>
+    <p class="dish">Riso ai Limoni - gamberi e lime</p>
+    <div class="divider"></div>
     <p class="dish">Busiata con pomodorino giallo, scampi, gamberi, mollica tostata e mandorle</p>
   </div>
 
