@@ -62,21 +62,30 @@ body{
   opacity:0; pointer-events:none; transition:opacity .25s ease; padding:20px; }
 .lightbox.open{ opacity:1; pointer-events:auto; }
 
-.lightbox-img{ max-width:100%; max-height:70vh; border-radius:12px; box-shadow:0 20px 60px -20px rgba(0,0,0,.6);
+/* Chiusura X in alto a destra */
+.btn-close-x{ position:absolute; top:16px; right:16px; z-index:110;
+  background:rgba(246,241,228,.12); border:1px solid rgba(246,241,228,.25);
+  color:var(--cream); width:40px; height:40px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center; cursor:pointer;
+  font-size:20px; line-height:1; transition:background .2s; padding:0; }
+.btn-close-x:hover{ background:rgba(246,241,228,.25); }
+.btn-close-x svg{ width:18px; height:18px; }
+
+.lightbox-img{ max-width:100%; max-height:65vh; border-radius:12px; box-shadow:0 20px 60px -20px rgba(0,0,0,.6);
   object-fit:contain; }
 
 /* caption rimosso */
 
-.lightbox-nav{ display:flex; gap:12px; margin-top:20px; flex-wrap:wrap; justify-content:center; }
-.btn{ display:inline-flex; align-items:center; gap:8px; font-family:var(--mono); font-size:13px; font-weight:500;
-  padding:12px 20px; border-radius:999px; border:none; cursor:pointer; transition:all .2s ease;
-  text-decoration:none; }
-.btn-close{ background:rgba(246,241,228,.15); color:var(--cream); border:1px solid rgba(246,241,228,.3); }
-.btn-close:hover{ background:rgba(246,241,228,.25); }
+.lightbox-nav{ display:flex; gap:10px; margin-top:20px; align-items:center; width:100%; max-width:400px; }
+.lightbox-nav .spacer{ flex:1; } /* spinge i bottoni ai lati */
+.btn{ display:inline-flex; align-items:center; gap:6px; font-family:var(--mono); font-size:13px; font-weight:500;
+  padding:11px 18px; border-radius:999px; border:none; cursor:pointer; transition:all .2s ease;
+  text-decoration:none; white-space:nowrap; }
+.btn-pistacchio{ background:var(--pistachio); color:var(--cream); }
+.btn-pistacchio:hover{ background:#6da05a; transform:translateY(-1px); }
 .btn-download{ background:var(--gold); color:var(--party-ink); }
 .btn-download:hover{ background:#d9a94e; transform:translateY(-1px); }
-.btn-next{ background:var(--pistachio); color:var(--cream); }
-.btn-next:hover{ background:#6da05a; transform:translateY(-1px); }
+.btn-center{ margin:0 auto; } /* scarica centrato */
 
 .btn svg{ width:16px; height:16px; }
 
@@ -109,18 +118,21 @@ body{
 
 <!-- Lightbox -->
 <div class="lightbox" id="lightbox">
+  <button class="btn-close-x" onclick="closeLightbox()" aria-label="Chiudi">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+  </button>
   <img class="lightbox-img" id="lightbox-img" src="" alt="" />
   <!-- caption rimosso -->
   <div class="lightbox-nav">
-    <button class="btn btn-close" onclick="closeLightbox()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
-      Chiudi
+    <button class="btn btn-pistacchio" onclick="prevPhoto()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+      Indietro
     </button>
-    <button class="btn btn-download" id="btn-download">
+    <button class="btn btn-download btn-center" id="btn-download">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
       Scarica
     </button>
-    <button class="btn btn-next" onclick="nextPhoto()">
+    <button class="btn btn-pistacchio" onclick="nextPhoto()">
       Avanti
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
     </button>
@@ -235,6 +247,11 @@ function closeLightbox() {
   document.body.style.overflow = '';
 }
 
+function prevPhoto() {
+  currentIndex = (currentIndex - 1 + photos.length) % photos.length;
+  updateLightbox();
+}
+
 function nextPhoto() {
   currentIndex = (currentIndex + 1) % photos.length;
   updateLightbox();
@@ -274,6 +291,7 @@ btnDownload.addEventListener('click', async () => {
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') closeLightbox();
   if (e.key === 'ArrowRight') nextPhoto();
+  if (e.key === 'ArrowLeft') prevPhoto();
 });
 
 // Click fuori chiude
