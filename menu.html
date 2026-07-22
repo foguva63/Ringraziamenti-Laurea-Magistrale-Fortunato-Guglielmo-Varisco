@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<meta name="theme-color" content="#f6f1e4" />
+<title>Menu · Laurea FOGUVA</title>
+
+<!-- Stessi font della pagina principale, per coerenza visiva -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+
+<style>
+/* =====================================================================
+   ⚙️  Stessa palette "festa" della pagina principale (index.html),
+   così le due pagine sembrano parte della stessa esperienza.
+   ===================================================================== */
+:root{
+  --cream:        #f6f1e4;
+  --cream-2:      #efe7d3;
+  --pistachio:    #5f8f4e;
+  --pistachio-dk: #2f4a26;
+  --gold:         #cf9d3f;
+  --party-ink:    #23301c;
+
+  --mono:  "JetBrains Mono", ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  --serif: "Fraunces", ui-serif, Georgia, "Times New Roman", serif;
+}
+
+*{ margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html,body{ height:100%; }
+body{
+  background:
+    radial-gradient(130% 60% at 50% 0%, rgba(207,157,63,.16), transparent 60%),
+    linear-gradient(var(--cream), var(--cream-2));
+  color:var(--party-ink);
+  font-family:var(--mono);
+  min-height:100%;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  padding:34px 20px calc(34px + env(safe-area-inset-bottom));
+}
+
+.wrap{ width:100%; max-width:440px; margin:0 auto; display:flex; flex-direction:column; gap:18px; }
+
+/* ===== Intestazione ===== */
+.head{ text-align:center; margin-bottom:4px; }
+.head .eyebrow{ font-family:var(--mono); font-size:11.5px; letter-spacing:.22em; text-transform:uppercase; color:var(--gold); }
+.head h1{ font-family:var(--serif); font-weight:600; font-size:36px; line-height:1.05; margin:10px 0 6px; color:var(--pistachio-dk); }
+.head .sub{ font-family:var(--mono); font-size:12px; color:var(--pistachio); letter-spacing:.03em; }
+
+/* ===== Card di ogni portata ===== */
+.card{ background:#fff; border:1px solid rgba(95,143,78,.18); border-radius:18px; padding:22px 20px;
+  box-shadow:0 10px 30px -18px rgba(47,74,38,.5); }
+
+.course-label{ display:inline-flex; align-items:center; gap:8px; font-family:var(--mono); font-size:11.5px;
+  letter-spacing:.18em; text-transform:uppercase; color:var(--pistachio); border:1px solid rgba(95,143,78,.35);
+  border-radius:999px; padding:6px 13px; margin-bottom:14px; background:rgba(95,143,78,.06); }
+
+.dish{ font-family:var(--serif); font-style:italic; font-weight:500; font-size:16.5px; line-height:1.5; color:var(--party-ink); }
+.dish + .dish{ margin-top:14px; }
+.note{ font-family:var(--mono); font-size:12px; color:var(--gold); margin-top:12px; letter-spacing:.02em; }
+
+.or-divider{ display:flex; align-items:center; gap:10px; margin:16px 0; font-family:var(--mono);
+  font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--pistachio); opacity:.75; }
+.or-divider::before, .or-divider::after{ content:""; flex:1; height:1px; background:rgba(95,143,78,.25); }
+
+/* ===== Footer ===== */
+.footer{ text-align:center; font-family:var(--mono); font-size:11px; color:var(--pistachio); opacity:.75;
+  letter-spacing:.08em; padding:10px 0 4px; }
+
+@media (min-width:520px){ .head h1{ font-size:42px; } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="head">
+    <div class="eyebrow">— cena di laurea —</div>
+    <h1>Il Menu</h1>
+    <div class="sub">Dott. Fortunato Guglielmo Varisco</div>
+  </div>
+
+  <div class="card">
+    <div class="course-label">Antipasto</div>
+    <p class="dish">Tortino di salmone con mozzarella di bufala, cocktail di gamberi, insalata di mare, polpo scottato su purea di patate.</p>
+    <p class="note">Frittura di paranza al centro tavola</p>
+  </div>
+
+  <div class="card">
+    <div class="course-label">Primo</div>
+    <p class="dish">Riso gamberi e lime</p>
+    <div class="or-divider">oppure</div>
+    <p class="dish">Busiata con pomodorino giallo, scampi, gamberi, mollica tostata e mandorle</p>
+  </div>
+
+  <div class="card">
+    <div class="course-label">Secondo</div>
+    <p class="dish">Filetto di pescato con panatura di scaccia siciliana in crosta di patate con verdure saltate al burro</p>
+  </div>
+
+  <div class="card">
+    <div class="course-label">Dolce</div>
+    <p class="dish">Frutta di stagione e Torta Gelato</p>
+  </div>
+
+  <div class="footer">buon appetito 💚</div>
+
+</div>
+
+</body>
+</html>
