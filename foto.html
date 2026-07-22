@@ -76,8 +76,8 @@ body{
 
 /* caption rimosso */
 
-.lightbox-nav{ display:flex; gap:10px; margin-top:20px; align-items:center; width:100%; max-width:400px; }
-.lightbox-nav .spacer{ flex:1; } /* spinge i bottoni ai lati */
+.lightbox-nav{ display:flex; flex-direction:column; gap:12px; margin-top:20px; align-items:center; width:100%; max-width:400px; }
+.lightbox-nav-row{ display:flex; gap:10px; justify-content:center; width:100%; }
 .btn{ display:inline-flex; align-items:center; gap:6px; font-family:var(--mono); font-size:13px; font-weight:500;
   padding:11px 18px; border-radius:999px; border:none; cursor:pointer; transition:all .2s ease;
   text-decoration:none; white-space:nowrap; }
@@ -85,7 +85,6 @@ body{
 .btn-pistacchio:hover{ background:#6da05a; transform:translateY(-1px); }
 .btn-download{ background:var(--gold); color:var(--party-ink); }
 .btn-download:hover{ background:#d9a94e; transform:translateY(-1px); }
-.btn-center{ margin:0 auto; } /* scarica centrato */
 
 .btn svg{ width:16px; height:16px; }
 
@@ -124,18 +123,22 @@ body{
   <img class="lightbox-img" id="lightbox-img" src="" alt="" />
   <!-- caption rimosso -->
   <div class="lightbox-nav">
-    <button class="btn btn-pistacchio" onclick="prevPhoto()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
-      Indietro
-    </button>
-    <button class="btn btn-download btn-center" id="btn-download">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-      Scarica
-    </button>
-    <button class="btn btn-pistacchio" onclick="nextPhoto()">
-      Avanti
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-    </button>
+    <div class="lightbox-nav-row">
+      <button class="btn btn-pistacchio" onclick="prevPhoto()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+        Indietro
+      </button>
+      <button class="btn btn-pistacchio" onclick="nextPhoto()">
+        Avanti
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </div>
+    <div class="lightbox-nav-row">
+      <button class="btn btn-download" id="btn-download">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+        Scarica
+      </button>
+    </div>
   </div>
 </div>
 
