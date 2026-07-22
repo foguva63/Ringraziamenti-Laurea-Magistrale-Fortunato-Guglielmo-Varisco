@@ -65,8 +65,7 @@ body{
 .lightbox-img{ max-width:100%; max-height:70vh; border-radius:12px; box-shadow:0 20px 60px -20px rgba(0,0,0,.6);
   object-fit:contain; }
 
-.lightbox-caption{ margin-top:14px; font-family:var(--mono); font-size:12px; color:rgba(246,241,228,.7);
-  letter-spacing:.05em; }
+/* caption rimosso */
 
 .lightbox-nav{ display:flex; gap:12px; margin-top:20px; flex-wrap:wrap; justify-content:center; }
 .btn{ display:inline-flex; align-items:center; gap:8px; font-family:var(--mono); font-size:13px; font-weight:500;
@@ -111,7 +110,7 @@ body{
 <!-- Lightbox -->
 <div class="lightbox" id="lightbox">
   <img class="lightbox-img" id="lightbox-img" src="" alt="" />
-  <div class="lightbox-caption" id="lightbox-caption"></div>
+  <!-- caption rimosso -->
   <div class="lightbox-nav">
     <button class="btn btn-close" onclick="closeLightbox()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
@@ -130,35 +129,98 @@ body{
 
 <script>
 // =====================================================================
-// 📸  CONFIGURAZIONE FOTO
-// Modifica questo array con i nomi dei tuoi file foto.
-// Le foto devono essere nella stessa cartella di questo file.
+// 📸  CONFIGURAZIONE — come in index.html
 // =====================================================================
-const photos = [
-  { src: 'foto1.jpg', caption: 'La cerimonia' },
-  { src: 'foto2.jpg', caption: 'Il brindisi' },
-  { src: 'foto3.jpg', caption: 'Con gli amici' },
-  { src: 'foto4.jpg', caption: 'La torta' },
-  { src: 'foto5.jpg', caption: 'I festeggiamenti' },
-  { src: 'foto6.jpg', caption: 'La famiglia' },
-];
+const PHOTO_CONFIG = {
+  // Lista manuale (se compilata, salta l'auto-rilevamento)
+  photos: [],
+  // Auto-rilevamento da GitHub (stessa logica di index.html)
+  autoDetect: {
+    owner:  "",
+    repo:   "",
+    branch: "main",
+    folder: "photos"
+  }
+};
 
+let photos = [];       // array di URL
 let currentIndex = 0;
 
-// Render galleria
-const gallery = document.getElementById('gallery');
-photos.forEach((photo, i) => {
-  const div = document.createElement('div');
-  div.className = 'gallery-item';
-  div.onclick = () => openLightbox(i);
-  div.innerHTML = `<img src="${photo.src}" alt="${photo.caption}" loading="lazy" />`;
-  gallery.appendChild(div);
-});
+// === Auto-rilevamento foto (stessa logica di index.html) ===
+async function loadPhotos(){
+  const manual = Array.isArray(PHOTO_CONFIG.photos) ? PHOTO_CONFIG.photos.filter(Boolean) : [];
+  if(manual.length > 0){ photos = manual; renderGallery(); return; }
 
-// Lightbox
+  const urls = await autoDetectPhotos();
+  if(urls.length > 0){ photos = urls; renderGallery(); }
+}
+
+async function autoDetectPhotos(){
+  const cfg = PHOTO_CONFIG.autoDetect || {};
+  let owner = cfg.owner, repo = cfg.repo;
+  const branch = cfg.branch || "main";
+  const folder = cfg.folder || "photos";
+
+  if(!owner || !repo){
+    const host = location.hostname;
+    if(!host.endsWith(".github.io")) return [];
+    owner = host.split(".")[0];
+    const seg = location.pathname.split("/").filter(Boolean);
+    repo = seg.length > 0 ? seg[0] : (owner + ".github.io");
+  }
+
+  try{
+    const api = `https://api.github.com/repos/${owner}/${repo}/contents/${folder}?ref=${branch}`;
+    const res = await fetch(api, { headers:{ "Accept":"application/vnd.github+json" } });
+    if(!res.ok) return [];
+    const items = await res.json();
+    if(!Array.isArray(items)) return [];
+    return items
+      .filter(it => it.type === "file" && /\.(jpe?g|png)$/i.test(it.name))
+      .sort((a,b) => a.name.localeCompare(b.name))
+      .map(it => it.download_url);
+  }catch(err){
+    return [];
+  }
+}
+
+// === Galleria ===
+const gallery = document.getElementById('gallery');
+
+function renderGallery(){
+  gallery.innerHTML = "";
+  if(photos.length === 0){
+    for(let i=0; i<6; i++){
+      const d = document.createElement('div');
+      d.className = 'gallery-item';
+      d.style.background = 'rgba(95,143,78,.06)';
+      d.style.display = 'flex';
+      d.style.alignItems = 'center';
+      d.style.justifyContent = 'center';
+      d.style.fontSize = '26px';
+      d.style.color = 'var(--pistachio)';
+      d.textContent = '＋';
+      gallery.appendChild(d);
+    }
+    return;
+  }
+  photos.forEach((url, i) => {
+    const div = document.createElement('div');
+    div.className = 'gallery-item';
+    div.onclick = () => openLightbox(i);
+    const img = document.createElement('img');
+    img.loading = 'lazy';
+    img.alt = 'Foto festa';
+    img.src = url;
+    img.onerror = function(){ this.alt = '?'; this.style.background = 'rgba(95,143,78,.06)'; };
+    div.appendChild(img);
+    gallery.appendChild(div);
+  });
+}
+
+// === Lightbox ===
 const lightbox = document.getElementById('lightbox');
 const lightboxImg = document.getElementById('lightbox-img');
-const lightboxCaption = document.getElementById('lightbox-caption');
 const btnDownload = document.getElementById('btn-download');
 
 function openLightbox(index) {
@@ -179,24 +241,26 @@ function nextPhoto() {
 }
 
 function updateLightbox() {
-  const photo = photos[currentIndex];
-  lightboxImg.src = photo.src;
-  lightboxImg.alt = photo.caption;
-  lightboxCaption.textContent = photo.caption;
-  btnDownload.href = photo.src;
-  btnDownload.download = photo.src.split('/').pop();
+  const url = photos[currentIndex];
+  lightboxImg.src = url;
+  lightboxImg.alt = 'Foto festa';
+  btnDownload.href = url;
+  btnDownload.download = url.split('/').pop();
 }
 
-// Chiudi con ESC
+// Keyboard
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') closeLightbox();
   if (e.key === 'ArrowRight') nextPhoto();
 });
 
-// Chiudi cliccando fuori dalla foto
+// Click fuori chiude
 lightbox.addEventListener('click', (e) => {
   if (e.target === lightbox) closeLightbox();
 });
+
+// Avvio
+loadPhotos();
 </script>
 
 </body>

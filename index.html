@@ -588,7 +588,7 @@ button{ font-family:inherit; color:inherit; cursor:pointer; border:none; backgro
         <div class="ctf-hint-title">Indizio CTF</div>
         <div class="ctf-hint-sub">Input validation:</div>
         <pre class="ctf-code">$query = "SELECT * FROM users
-                      WHERE nome = '" . $_POST['nome'] . " ' ":</pre>
+          WHERE nome = '" . $_POST['nome'] . " ' ":</pre>
       </div>
     </div>
 
@@ -654,7 +654,7 @@ button{ font-family:inherit; color:inherit; cursor:pointer; border:none; backgro
       <div class="eyebrow">missione compilata con successo</div>
       <!-- 🔧 PERSONALIZZA QUI il nome del festeggiato -->
       <h1>Dott. <em id="honoreeName">Fortunato Guglielmo Varisco</em></h1>
-      <div class="sub">Laurea Magistrale · Ingegneria Informatica — Cybersecurity</div>
+      <div class="sub">Laurea Magistrale</br>Ingegneria Informatica — Cybersecurity</div>
     </div>
 
     <!-- 🔧 Il testo di ringraziamento si scrive da solo (effetto terminale) — vedi CONFIG.thanksLines -->
@@ -684,7 +684,7 @@ button{ font-family:inherit; color:inherit; cursor:pointer; border:none; backgro
         <div class="ph">＋</div><div class="ph">＋</div><div class="ph">＋</div>
       </div>
       <div class="link-row">
-        <a class="big-link music" id="musicLink" href="#" target="_blank" rel="noopener">🎵 Apri la playlist della festa</a>
+        <a class="big-link photos" id="photosLink" href="foto.html">Guarda tutte le foto!📸</a>
       </div>
     </div>
 
@@ -805,7 +805,7 @@ function buzz(pattern){
 
 // ----- Applica la configurazione ai testi statici -----
 document.getElementById("honoreeName").textContent = CONFIG.nomeFesteggiato;
-document.getElementById("musicLink").href  = CONFIG.linkMusica;
+// il link foto è già impostato nell'HTML
 let jars  = CONFIG.vasettiIniziali;
 let glic  = CONFIG.glicemiaIniziale;
 
