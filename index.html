@@ -1258,20 +1258,24 @@ async function autoDetectPhotos(){
   }
 }
 
-// Disegna la griglia: foto reali + segnaposto fino a riempire 6 celle
+// Mostra al massimo 6 foto in 2 righe da 3, non cliccabili
 function renderPhotos(urls){
   photoGrid.innerHTML = "";
-  const cells = Math.max(6, urls.length);
-  for(let i=0; i<cells; i++){
-    if(urls[i]){
-      const a = document.createElement("a");
-      a.href = urls[i]; a.target = "_blank"; a.rel = "noopener";
+  const count = Math.min(6, urls.length);
+  for(let i=0; i<6; i++){
+    if(i < count && urls[i]){
+      const div = document.createElement("div");
+      div.className = "ph";
+      div.style.overflow = "hidden";
+      div.style.border = "1.5px solid rgba(95,143,78,.2)";
+      div.style.background = "rgba(95,143,78,.08)";
       const img = document.createElement("img");
       img.loading = "lazy"; img.alt = "Foto della festa"; img.src = urls[i];
-      // se un file manca/non carica, la cella torna un segnaposto invece di rompersi
-      img.onerror = () => { a.replaceWith(makePlaceholder()); };
-      a.appendChild(img); photoGrid.appendChild(a);
-    }else if(i < 6){
+      img.style.width = "100%"; img.style.height = "100%"; img.style.objectFit = "cover"; img.style.display = "block";
+      img.onerror = function(){ this.style.display = "none"; this.parentElement.textContent = "＋"; this.parentElement.style.display = "flex"; };
+      div.appendChild(img);
+      photoGrid.appendChild(div);
+    } else {
       photoGrid.appendChild(makePlaceholder());
     }
   }
