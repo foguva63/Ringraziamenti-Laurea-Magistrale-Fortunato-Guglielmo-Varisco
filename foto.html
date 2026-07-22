@@ -116,10 +116,10 @@ body{
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
       Chiudi
     </button>
-    <a class="btn btn-download" id="btn-download" href="" download>
+    <button class="btn btn-download" id="btn-download">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
       Scarica
-    </a>
+    </button>
     <button class="btn btn-next" onclick="nextPhoto()">
       Avanti
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
@@ -244,9 +244,31 @@ function updateLightbox() {
   const url = photos[currentIndex];
   lightboxImg.src = url;
   lightboxImg.alt = 'Foto festa';
-  btnDownload.href = url;
-  btnDownload.download = url.split('/').pop();
 }
+
+// Download via blob (funziona anche per URL cross-origin come GitHub raw)
+btnDownload.addEventListener('click', async () => {
+  const url = photos[currentIndex];
+  if(!url) return;
+  try{
+    btnDownload.disabled = true;
+    btnDownload.textContent = '⏳';
+    const res = await fetch(url);
+    const blob = await res.blob();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = url.split('/').pop() || 'foto.jpg';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+    btnDownload.textContent = '✅ Fatto';
+    setTimeout(() => { btnDownload.textContent = 'Scarica'; btnDownload.disabled = false; }, 1800);
+  }catch(e){
+    btnDownload.textContent = '❌ Errore';
+    setTimeout(() => { btnDownload.textContent = 'Scarica'; btnDownload.disabled = false; }, 2000);
+  }
+});
 
 // Keyboard
 document.addEventListener('keydown', (e) => {
