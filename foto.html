@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<meta name="theme-color" content="#f6f1e4" />
+<title>Foto · Laurea FOGUVA</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+
+<style>
+:root{
+  --cream:        #f6f1e4;
+  --cream-2:      #efe7d3;
+  --pistachio:    #5f8f4e;
+  --pistachio-dk: #2f4a26;
+  --gold:         #cf9d3f;
+  --party-ink:    #23301c;
+
+  --mono:  "JetBrains Mono", ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  --serif: "Fraunces", ui-serif, Georgia, "Times New Roman", serif;
+}
+
+*{ margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html,body{ height:100%; }
+body{
+  background:
+    radial-gradient(130% 60% at 50% 0%, rgba(207,157,63,.16), transparent 60%),
+    linear-gradient(var(--cream), var(--cream-2));
+  color:var(--party-ink);
+  font-family:var(--mono);
+  min-height:100%;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  padding:34px 20px calc(34px + env(safe-area-inset-bottom));
+}
+
+.wrap{ width:100%; max-width:440px; margin:0 auto; display:flex; flex-direction:column; gap:18px; }
+
+/* ===== Intestazione ===== */
+.head{ text-align:center; margin-bottom:4px; }
+.head h1{ display:flex; align-items:center; justify-content:center; gap:10px;
+  font-family:var(--serif); font-weight:600; font-size:36px; line-height:1.05; margin:0 0 10px; color:var(--pistachio-dk); }
+.head-icon{ height:.85em; width:auto; display:block; filter:drop-shadow(0 2px 5px rgba(47,74,38,.25)); }
+.head .sub{ font-family:var(--mono); font-size:12px; color:var(--pistachio); letter-spacing:.03em; line-height:1.6; }
+
+/* ===== Galleria ===== */
+.gallery{ display:grid; grid-template-columns:repeat(2, 1fr); gap:12px; }
+.gallery-item{ position:relative; aspect-ratio:1; border-radius:14px; overflow:hidden; cursor:pointer;
+  border:1px solid rgba(95,143,78,.18); box-shadow:0 6px 20px -12px rgba(47,74,38,.4);
+  transition:transform .2s ease, box-shadow .2s ease; }
+.gallery-item:active{ transform:scale(.97); }
+.gallery-item img{ width:100%; height:100%; object-fit:cover; display:block; }
+.gallery-item::after{ content:''; position:absolute; inset:0; background:rgba(95,143,78,0); transition:background .2s; }
+.gallery-item:hover::after{ background:rgba(95,143,78,.08); }
+
+/* ===== Lightbox ===== */
+.lightbox{ position:fixed; inset:0; z-index:100; background:rgba(35,48,28,.92); backdrop-filter:blur(8px);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  opacity:0; pointer-events:none; transition:opacity .25s ease; padding:20px; }
+.lightbox.open{ opacity:1; pointer-events:auto; }
+
+.lightbox-img{ max-width:100%; max-height:70vh; border-radius:12px; box-shadow:0 20px 60px -20px rgba(0,0,0,.6);
+  object-fit:contain; }
+
+.lightbox-caption{ margin-top:14px; font-family:var(--mono); font-size:12px; color:rgba(246,241,228,.7);
+  letter-spacing:.05em; }
+
+.lightbox-nav{ display:flex; gap:12px; margin-top:20px; flex-wrap:wrap; justify-content:center; }
+.btn{ display:inline-flex; align-items:center; gap:8px; font-family:var(--mono); font-size:13px; font-weight:500;
+  padding:12px 20px; border-radius:999px; border:none; cursor:pointer; transition:all .2s ease;
+  text-decoration:none; }
+.btn-close{ background:rgba(246,241,228,.15); color:var(--cream); border:1px solid rgba(246,241,228,.3); }
+.btn-close:hover{ background:rgba(246,241,228,.25); }
+.btn-download{ background:var(--gold); color:var(--party-ink); }
+.btn-download:hover{ background:#d9a94e; transform:translateY(-1px); }
+.btn-next{ background:var(--pistachio); color:var(--cream); }
+.btn-next:hover{ background:#6da05a; transform:translateY(-1px); }
+
+.btn svg{ width:16px; height:16px; }
+
+/* ===== Footer ===== */
+.footer{ text-align:center; font-family:var(--mono); font-size:11px; color:var(--pistachio); opacity:.75;
+  letter-spacing:.08em; padding:10px 0 4px; }
+.date{ text-align:center; font-family:var(--mono); font-size:14px; font-weight:700; color:var(--pistachio-dk); opacity:.9;
+  letter-spacing:.08em; margin-bottom:24px; }
+
+@media (min-width:520px){ .head h1{ font-size:42px; } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="head">
+    <h1><img src="cappello.png" alt="" class="head-icon" onerror="this.style.display='none'">Foto</h1>
+    <div class="sub">Laurea Magistrale in<br>Ingegneria Informatica - Cybersecurity<br>Dott. Fortunato Guglielmo Varisco</div>
+  </div>
+
+  <div class="gallery" id="gallery">
+    <!-- Le foto verranno caricate qui via JS -->
+  </div>
+
+  <div class="footer">ricordi 💚</div>
+  <div class="date">21 Luglio 2026</div>
+
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox">
+  <img class="lightbox-img" id="lightbox-img" src="" alt="" />
+  <div class="lightbox-caption" id="lightbox-caption"></div>
+  <div class="lightbox-nav">
+    <button class="btn btn-close" onclick="closeLightbox()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      Chiudi
+    </button>
+    <a class="btn btn-download" id="btn-download" href="" download>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+      Scarica
+    </a>
+    <button class="btn btn-next" onclick="nextPhoto()">
+      Avanti
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+// =====================================================================
+// 📸  CONFIGURAZIONE FOTO
+// Modifica questo array con i nomi dei tuoi file foto.
+// Le foto devono essere nella stessa cartella di questo file.
+// =====================================================================
+const photos = [
+  { src: 'foto1.jpg', caption: 'La cerimonia' },
+  { src: 'foto2.jpg', caption: 'Il brindisi' },
+  { src: 'foto3.jpg', caption: 'Con gli amici' },
+  { src: 'foto4.jpg', caption: 'La torta' },
+  { src: 'foto5.jpg', caption: 'I festeggiamenti' },
+  { src: 'foto6.jpg', caption: 'La famiglia' },
+];
+
+let currentIndex = 0;
+
+// Render galleria
+const gallery = document.getElementById('gallery');
+photos.forEach((photo, i) => {
+  const div = document.createElement('div');
+  div.className = 'gallery-item';
+  div.onclick = () => openLightbox(i);
+  div.innerHTML = `<img src="${photo.src}" alt="${photo.caption}" loading="lazy" />`;
+  gallery.appendChild(div);
+});
+
+// Lightbox
+const lightbox = document.getElementById('lightbox');
+const lightboxImg = document.getElementById('lightbox-img');
+const lightboxCaption = document.getElementById('lightbox-caption');
+const btnDownload = document.getElementById('btn-download');
+
+function openLightbox(index) {
+  currentIndex = index;
+  updateLightbox();
+  lightbox.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+  lightbox.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function nextPhoto() {
+  currentIndex = (currentIndex + 1) % photos.length;
+  updateLightbox();
+}
+
+function updateLightbox() {
+  const photo = photos[currentIndex];
+  lightboxImg.src = photo.src;
+  lightboxImg.alt = photo.caption;
+  lightboxCaption.textContent = photo.caption;
+  btnDownload.href = photo.src;
+  btnDownload.download = photo.src.split('/').pop();
+}
+
+// Chiudi con ESC
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeLightbox();
+  if (e.key === 'ArrowRight') nextPhoto();
+});
+
+// Chiudi cliccando fuori dalla foto
+lightbox.addEventListener('click', (e) => {
+  if (e.target === lightbox) closeLightbox();
+});
+</script>
+
+</body>
+</html>
