@@ -724,9 +724,9 @@ const CONFIG = {
     withoutName: "Grazie di cuore per essere qui a festeggiare questo traguardo con me. 🎓"
   },
   thanksLines: [
-    { chunks:[ { t:"Dietro ogni riga di codice e ogni notte insonne c'eravate voi: la mia rete di sicurezza più affidabile, il mio backup quando tutto sembrava andare in crash. Questo vasetto di crema siciliana è un piccolo grazie, cifrato con affetto e servito in cassetta della frutta stampata in 3D." } ] },
-    { chunks:[ { t:"Godetevi la festa, la cena è ufficialmente " }, { t:"senza firewall", b:true }, { t:". 🍕" } ] },
-    { chunks:[ { t:"— con gratitudine, il neodottore" } ], signature:true }
+    { chunks:[ { t:"Dopo anni di nottate, caffè e codice da compilare, finalmente questa laurea magistrale è arrivata. Questo momento di festa è pensato proprio per staccare la spina e godersi la serata con le persone a cui voglio bene. Stasera niente scadenze o bug da risolvere: solo buon cibo e brindisi. Prendi pure la tua cassetta, goditi la crema e preparati a festeggiare come si deve! 🥂." } ] },
+    { chunks:[ { t:"Grazie ancora {nome}" } ] },
+    { chunks:[ { t:"— con gratitudine, il neo Ingegnere" } ], signature:true }
   ],
   linkMusica:"#",                      // 🔧 URL playlist (es. Spotify)
 
@@ -774,16 +774,16 @@ const CONFIG = {
   // 🔧 QUIZ — una domanda per ruolo. correct = indice risposta giusta (0 = A, 1 = B …)
   quiz: {
     parente: {
-      q: "Quante volte hai chiesto al festeggiato di aggiustarti la stampante o il Wi-Fi?",
-      opts: ["Troppe, ho perso il conteggio.", "Mai, sono un hacker autonomo."],
+      q: "Quante volte hai chiesto al festeggiato di aggiustarti il Wi-Fi o hai chiesto che telefonino comprare?",
+      opts: ["Abbastanza da avergli fatto mettere 'consulente IT di famiglia' sul curriculum.", "Gli ho mandato 47 screenshot su WhatsApp con scritto 'quale mi consigli?'."],
       correct: 0,
-      wrong: "ACCESSO NEGATO: risposta troppo onesta, riprova… o corrompi il neodottore con un brindisi. 🍷"
+      allCorrect: true
     },
     amico: {
-      q: "Da quanti anni prometti al festeggiato che 'stavolta studio anch'io'?",
-      opts: ["Da così tanti che è diventato Dottore prima di me.", "Studio? Io reggo il morale, è un lavoro a tempo pieno."],
-      correct: 1,
-      wrong: "ACCESSO NEGATO: nice try. Riprova o offri il prossimo giro. 🍻"
+      q: "Quante volte hai chiesto al festeggiato di installare Word craccato?",
+      opts: ["Almeno 17. E ogni volta giuravo che 'era l'ultima, poi compro la licenza'.", "Mai chiesto… perché gliel'ho fatto fare da remoto con AnyDesk mentre era a lezione."],
+      correct: 0,
+      allCorrect: true
     },
     collega: {
       q: "Qual è il miglior modo per mitigare un attacco DDoS al tavolo dei dolci?",
@@ -1090,7 +1090,7 @@ function loadQuiz(role){
 }
 
 function answer(i, btnEl){
-  const correct = (i === currentQuiz.correct);
+  const correct = currentQuiz.allCorrect ? true : (i === currentQuiz.correct);
   // Al 2° tentativo lasciamo passare comunque (nessun ospite resta bloccato)
   if(correct || attempts >= 1){
     btnEl.classList.add("right");
@@ -1180,13 +1180,18 @@ function typeThanks(){
     if(line.signature) el.className = "sign";
     thanksTerminal.appendChild(el);
 
+    // Sostituisci {nome} in ogni chunk con il nome dell'ospite
+    if(guestName){
+      line.chunks.forEach(c => { c.t = c.t.replace(/\{nome\}/g, guestName); });
+    }
+
     const cursor = document.createElement("span");
     cursor.className = "type-cursor";
     el.appendChild(cursor);
 
     typeChunks(el, cursor, line.chunks, 0, 0, () => {
-      cursor.remove();                    // il cursore resta solo sulla riga attiva
-      setTimeout(nextLine, 380);          // piccola pausa prima della riga successiva
+      cursor.remove();
+      setTimeout(nextLine, 380);
     });
   }
 
